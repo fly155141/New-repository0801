@@ -1,0 +1,143 @@
+<div th:fragment="content" xmlns:th="http://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
+    <h3 class="text-center" th:text="#{section.price}">票價查詢</h3>
+
+    <!-- 查詢表單 -->
+    <form id="searchForm" class="mb-3 d-flex justify-content-center align-items-center"
+          onsubmit="event.preventDefault(); loadPricePage(0);">
+        <input type="text" name="keyword" id="searchKeyword" class="form-control w-25 me-2"
+               th:placeholder="#{form.search.placeholder}" th:value="${searchKeyword}">
+        <button type="submit" class="btn btn-outline-dark" th:text="#{form.search}">查詢</button>
+        <a href="#" class="btn btn-outline-dark ms-2" onclick="clearSearch()" th:text="#{form.reset}">重新整理</a>
+    </form>
+
+    <!-- ADMIN才能看到新增資料與CSV -->
+<div th:if="${isAdmin}">
+    <h4 class="mt-4 text-center" th:text="#{form.addTitle}">新增資料</h4>
+    <div class="d-flex flex-wrap justify-content-center gap-2 mb-3">
+        <!-- 起站 -->
+        <div class="w-25">
+            <input class="form-control text-center" id="startStation" th:placeholder="#{form.startStation}">
+            <div class="alert alert-danger py-1 px-2 mt-1" id="error-startStation" style="display:none;">
+                <span th:text="#{form.start.required}">Start station must be in Chinese</span>
+            </div>
+        </div>
+
+        <!-- 訖站 -->
+        <div class="w-25">
+            <input class="form-control text-center" id="endStation" th:placeholder="#{form.endStation}">
+            <div class="alert alert-danger py-1 px-2 mt-1" id="error-endStation" style="display:none;">
+                <span th:text="#{form.end.required}">End station must be in Chinese</span>
+            </div>
+        </div>
+
+        <!-- 全票票價 -->
+        <div class="w-25">
+            <input type="number" class="form-control text-center" id="fullPrice" th:placeholder="#{form.fullPrice}">
+            <div class="alert alert-danger py-1 px-2 mt-1" id="error-fullPrice" style="display:none;">
+                <span th:text="#{form.fullPrice.positive}">Full fare must be a positive integer</span>
+            </div>
+        </div>
+
+        <!-- 新北市票價 -->
+        <div class="w-25">
+            <input type="number" class="form-control text-center" id="discountPriceNewTaipei" th:placeholder="#{form.discountNewTaipei}">
+            <div class="alert alert-danger py-1 px-2 mt-1" id="error-discountPriceNewTaipei" style="display:none;">
+                <span th:text="#{form.discount.ntpc.positive}">Discount fare (New Taipei) must be a positive integer</span>
+            </div>
+        </div>
+
+        <!-- 台北市票價 -->
+        <div class="w-25">
+            <input type="number" class="form-control text-center" id="discountPriceTaipei" th:placeholder="#{form.discountTaipei}">
+            <div class="alert alert-danger py-1 px-2 mt-1" id="error-discountPriceTaipei" style="display:none;">
+                <span th:text="#{form.discount.taipei.positive}">Discount fare (Taipei) must be a positive integer</span>
+            </div>
+        </div>
+
+        <!-- 距離 -->
+        <div class="w-25">
+            <input type="number" class="form-control text-center" id="distance" th:placeholder="#{form.distance}">
+            <div class="alert alert-danger py-1 px-2 mt-1" id="error-distance" style="display:none;">
+                <span th:text="#{form.distance.positive}">Distance must be a positive number</span>
+            </div>
+        </div>
+
+        <!-- 新增按鈕 -->
+        <div class="w-100 text-center mt-2">
+            <button type="button" class="btn btn-success" onclick="addData()" th:text="#{form.add}">新增資料</button>
+        </div>
+    </div>
+
+
+        <h4 class="mt-4 text-center" th:text="#{form.uploadTitle}">上傳 CSV</h4>
+        <div class="d-flex align-items-center justify-content-center gap-2 mt-3">
+            <input type="file" id="csvFile" class="d-none" accept=".csv" onchange="updateFileName()">
+            <button type="button" class="btn btn-outline-secondary" onclick="document.getElementById('csvFile').click()" th:text="#{file.choose}">選擇檔案</button>
+            <span id="fileNameLabel" class="text-muted" th:text="#{file.none}" th:attr="data-default=#{file.none}">未選擇任何檔案</span>
+            <button class="btn btn-primary" type="button" onclick="uploadCSV()" th:text="#{button.upload}">上傳</button>
+            <button class="btn btn-danger" type="button" onclick="clearAll()" th:text="#{button.clear}">一鍵清除</button>
+        </div>
+    </div>
+
+    <!-- 資料表格 -->
+    <div class="table-responsive mt-4">
+        <table id="dataTable" class="table table-bordered text-center align-middle" style="table-layout: fixed; width: 100%;">
+            <thead>
+            <tr>
+                <th data-field="id" th:attr="data-title=#{table.id}" onclick="sortBy('id')" th:text="#{table.id}">ID</th>
+                <th data-field="startStation" th:attr="data-title=#{table.startStation}" onclick="sortBy('startStation')" th:text="#{table.startStation}">起站</th>
+                <th data-field="endStation" th:attr="data-title=#{table.endStation}" onclick="sortBy('endStation')" th:text="#{table.endStation}">訖站</th>
+                <th data-field="fullPrice" th:attr="data-title=#{table.fullPrice}" onclick="sortBy('fullPrice')" th:text="#{table.fullPrice}">全票票價</th>
+                <th data-field="discountPriceNewTaipei" th:attr="data-title=#{table.discountNewTaipei}" onclick="sortBy('discountPriceNewTaipei')" th:text="#{table.discountNewTaipei}">新北市票價</th>
+                <th data-field="discountPriceTaipei" th:attr="data-title=#{table.discountTaipei}" onclick="sortBy('discountPriceTaipei')" th:text="#{table.discountTaipei}">台北市票價</th>
+                <th data-field="distance" th:attr="data-title=#{table.distance}" onclick="sortBy('distance')" th:text="#{table.distance}">距離</th>
+                <th data-field="createdAt" th:attr="data-title=#{table.createdAt}" onclick="sortBy('createdAt')" th:text="#{table.createdAt}">建立時間</th>
+                <th th:text="#{table.createdBy}">建立人</th>
+                <th th:text="#{table.actions}">操作</th>
+            </tr>
+            </thead>
+            <tbody id="tableBody">
+            <tr th:each="item : ${page.content}" th:id="'row-' + ${item.id}">
+                <td th:text="${item.id}"></td>
+                <td th:text="${item.startStation}"></td>
+                <td th:text="${item.endStation}"></td>
+                <td th:text="${item.fullPrice}"></td>
+                <td th:text="${item.discountPriceNewTaipei}"></td>
+                <td th:text="${item.discountPriceTaipei}"></td>
+                <td th:text="${item.distance}"></td>
+                <td th:text="${item.createdAt != null ? item.createdAt.toString().replace('T',' ').substring(0,16) : ''}"></td>
+                <td th:text="${item.createdBy}"></td>
+                <td>
+                    <div th:if="${isAdmin}">
+                        <button type="button" class="btn btn-warning btn-sm" th:id="'editBtn-' + ${item.id}" th:onclick="|editRow(${item.id})|" th:text="#{table.edit}">編輯</button>
+                        <button type="button" class="btn btn-success btn-sm d-none" th:id="'saveBtn-' + ${item.id}" th:onclick="|saveRow(${item.id})|" th:text="#{table.save}">儲存</button>
+                        <button type="button" class="btn btn-secondary btn-sm d-none" th:id="'cancelBtn-' + ${item.id}" th:onclick="|cancelEdit(${item.id})|" th:text="#{table.cancel}">取消</button>
+                        <button type="button" class="btn btn-danger btn-sm" th:onclick="|deleteData(${item.id})|" th:text="#{table.delete}">刪除</button>
+                    </div>
+                    <div>
+                        <button type="button"
+        class="btn btn-sm favorite-btn"
+        th:id="'favoriteBtn-' + ${item.id}"
+        th:classappend="${favorites.contains(item.id)} ? 'btn-danger' : 'btn-outline-danger'"
+        th:attr="data-id=${item.id}, data-favorited=${favorites.contains(item.id)}"
+        th:onclick="|toggleFavorite(${item.id})|"
+        th:text="${favorites.contains(item.id)} ? #{favorite.saved} : #{favorite.label}">
+    收藏
+</button>
+
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 分頁按鈕 -->
+    <div class="d-flex justify-content-center align-items-center gap-3 mt-4">
+        <button id="previousPageBtn" type="button" class="btn btn-outline-dark"
+                th:disabled="${page.number == 0}" onclick="previousPage()" th:text="#{table.prev}">⬅️ 上一頁</button>
+        <span th:text="|#{table.page} ${page.number + 1} / #{table.total} ${page.totalPages}|"></span>
+        <button id="nextPageBtn" type="button" class="btn btn-outline-dark"
+                th:disabled="${page.number + 1 == page.totalPages}" onclick="nextPage()" th:text="#{table.next}">下一頁 →</button>
+    </div>
+</div>

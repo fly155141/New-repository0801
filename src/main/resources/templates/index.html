@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{login.title}">登入</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; }
+        .container {
+            max-width: 500px;
+            margin-top: 180px;
+            padding: 30px;
+            border-radius: 15px;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        h1 { text-align: center; margin-bottom: 50px; }
+        h2 { text-align: center; margin-bottom: 25px; }
+        .invalid-feedback {
+            display: block;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1 th:text="#{site.title}">台北新北捷運查詢網站</h1>
+    <h2 th:text="#{login.title}">使用者登入</h2>
+
+    <!-- ❌ 登入錯誤 -->
+    <div th:if="${param.error}" class="alert alert-danger" id="errorMessage">
+        <span th:text="#{login.error}">帳號或密碼錯誤，請重新輸入</span>
+        （<span id="errorCountdown">5</span> <span th:text="#{countdown.seconds}">秒後自動返回首頁</span>）
+    </div>
+
+    <!-- ✅ 登出成功 -->
+    <div th:if="${param.logout}" class="alert alert-info" id="logoutMessage">
+        <span th:text="#{logout.success}">您已成功登出</span>
+        （<span id="logoutCountdown">5</span> <span th:text="#{countdown.seconds}">秒後自動返回首頁</span>）
+    </div>
+
+    <!-- ⏰ Session 逾時 -->
+    <div th:if="${param.timeout}" class="alert alert-warning" id="timeoutMessage">
+        <span th:text="#{login.timeout}">登入逾時，請重新登入</span>
+        （<span id="timeoutCountdown">5</span> <span th:text="#{countdown.seconds}">秒後自動返回首頁</span>）
+    </div>
+
+    <!-- 🔐 登入表單 -->
+    <form method="post" th:action="@{/login}" id="loginForm" novalidate>
+        <div class="mb-3">
+            <label class="form-label" th:text="#{label.username}">帳號：</label>
+            <input type="text" id="username" name="username" class="form-control" aria-describedby="usernameError">
+            <div id="usernameError" class="invalid-feedback"></div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" th:text="#{label.password}">密碼：</label>
+            <input type="password" id="password" name="password" class="form-control" aria-describedby="passwordError">
+            <div id="passwordError" class="invalid-feedback"></div>
+        </div>
+
+        <!-- CSRF -->
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+        <div class="d-grid">
+            <button type="submit" class="btn btn-primary" th:text="#{login.button}">登入</button>
+        </div>
+    </form>
+
+    <div class="text-center mt-3">
+        <a href="/auth/register" class="link-secondary" th:text="#{register.link}">申請帳號</a>
+    </div>
+
+    <!-- 🌐 語言切換 -->
+    <div class="text-center mt-4">
+        <a href="?lang=zh_TW">繁體中文</a> |
+        <a href="?lang=en">English</a>
+    </div>
+</div>
+
+<!-- ✅ JS：倒數與欄位驗證 -->
+<script th:inline="javascript">
+    const hasTimeoutParam = /*[[${param.timeout != null}]]*/ false;
+    const hasErrorParam   = /*[[${param.error != null}]]*/ false;
+    const hasLogoutParam  = /*[[${param.logout != null}]]*/ false;
+
+    if (hasTimeoutParam || hasErrorParam || hasLogoutParam) {
+        let countdown = 5;
+        let countdownSpan;
+
+        if (hasTimeoutParam) {
+            countdownSpan = document.getElementById("timeoutCountdown");
+        } else if (hasErrorParam) {
+            countdownSpan = document.getElementById("errorCountdown");
+        } else if (hasLogoutParam) {
+            countdownSpan = document.getElementById("logoutCountdown");
+        }
+
+        const interval = setInterval(() => {
+            countdown--;
+            countdownSpan.textContent = countdown;
+            if (countdown <= 0) {
+                clearInterval(interval);
+                window.location.href = "/index";
+            }
+        }, 1000);
+    }
+
+    // ✅ 自訂輸入欄位驗證
+    document.getElementById("loginForm").addEventListener("submit", function (e) {
+        const usernameEl = document.getElementById("username");
+        const passwordEl = document.getElementById("password");
+        const username = usernameEl.value.trim();
+        const password = passwordEl.value.trim();
+        const usernameError = document.getElementById("usernameError");
+        const passwordError = document.getElementById("passwordError");
+
+        // 清除提示
+        usernameError.textContent = "";
+        passwordError.textContent = "";
+        usernameEl.classList.remove("is-invalid");
+        passwordEl.classList.remove("is-invalid");
+
+        let valid = true;
+
+        if (!username) {
+            usernameError.textContent = /*[[#{form.username.required}]]*/ "請輸入帳號";
+            usernameEl.classList.add("is-invalid");
+            valid = false;
+        }
+
+        if (!password) {
+            passwordError.textContent = /*[[#{form.password.required}]]*/ "請輸入密碼";
+            passwordEl.classList.add("is-invalid");
+            valid = false;
+        }
+
+        if (!valid) {
+            e.preventDefault();
+        }
+    });
+</script>
+</body>
+</html>

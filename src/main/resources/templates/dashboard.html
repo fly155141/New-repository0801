@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/extras/spring-security"
+      th:lang="${#locale}">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{site.title}">台北新北捷運查詢網站</title>
+
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <style>
+        .marquee-container {
+            width: 100%;
+            overflow: hidden;
+            background-color: #ffcc00;
+            padding: 10px 0;
+        }
+        .marquee-text {
+            display: inline-block;
+            white-space: nowrap;
+            padding-left: 100%;
+            animation: scroll-left 15s linear infinite;
+            font-weight: bold;
+            font-size: 1.25rem;
+            color: #000;
+        }
+        @keyframes scroll-left {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+        footer {
+            background-color: #343a40;
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+        .navbar-nav {
+            gap: 20px;
+        }
+        .navbar-nav .nav-item {
+            min-width: 100px;
+            text-align: center;
+        }
+        .navbar-nav .nav-link {
+            white-space: nowrap;
+            line-height: 56px;
+            padding: 0 10px;
+        }
+        nav.navbar {
+            height: 56px;
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+        .main-content {
+            padding: 2rem;
+            min-height: 400px;
+            background: #fff;
+        }
+    </style>
+
+    <script th:inline="javascript">
+    /*<![CDATA[*/
+    window.i18n = {
+        'form.start.required': [[#{form.start.required}]],
+        'form.end.required': [[#{form.end.required}]],
+        'form.fullPrice.positive': [[#{form.fullPrice.positive}]],
+        'form.discount.ntpc.positive': [[#{form.discount.ntpc.positive}]],
+        'form.discount.taipei.positive': [[#{form.discount.taipei.positive}]],
+        'form.distance.positive': [[#{form.distance.positive}]]
+    };
+    /*]]>*/
+    </script>
+</head>
+<body>
+
+<header class="bg-primary text-white text-center p-3">
+    <h1 th:text="#{site.title}">台北新北捷運查詢網站</h1>
+</header>
+
+<div class="marquee-container">
+    <div id="marqueeText" class="marquee-text"
+         th:text="${announcement != null} ? ${announcement} : #{announcement.default}" >
+        尚無公告事項。
+    </div>
+</div>
+
+<div th:if="${isAdmin}">
+    <form id="announcementForm" class="d-flex justify-content-center mt-2"
+          onsubmit="event.preventDefault(); updateAnnouncement();">
+        <input type="text" id="announcementInput" class="form-control w-50 me-2"
+               th:placeholder="#{announcement.placeholder}" />
+        <button type="submit" class="btn btn-warning" th:text="#{announcement.updateBtn}">更新公告</button>
+    </form>
+</div>
+<!-- 放在 dashboard.html 的公告區塊附近 -->
+<div id="announcementMessage" class="text-center mt-2"></div>
+
+
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center w-100">
+            <ul class="navbar-nav mx-auto">
+                <li class="nav-item"><a class="nav-link" href="#price" onclick="navigateAndReload('price')" th:text="#{nav.price}">票價查詢</a></li>
+                <li class="nav-item"><a class="nav-link" href="#map" onclick="navigateAndReload('map')" th:text="#{nav.map}">自製地圖</a></li>
+                <li class="nav-item"><a class="nav-link" href="#shop" onclick="navigateAndReload('shop')" th:text="#{nav.shop}">購物專區</a></li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="switchLang()" th:text="${#locale.language.startsWith('en')} ? 'EN / CH' : '中 / EN'">中 / EN</a>
+                </li>
+            </ul>
+            <form th:action="@{/logout}" method="post" class="ms-3" onsubmit="clearCartBeforeLogout()">
+  <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
+  <button class="btn btn-outline-light" type="submit" th:text="#{nav.logout}">登出</button>
+</form>
+
+
+
+        </div>
+    </div>
+</nav>
+
+<main id="mainContent" class="main-content text-center">
+    <!-- JavaScript 動態載入內容 -->
+</main>
+
+<footer>
+    <span th:text="#{footer.phone}">聯絡電話：02-1234-5678</span> ｜ 
+    <span th:text="#{footer.email}">Email：service@mrt-tw.gov</span>
+</footer>
+
+<script>
+function loadContent(section) {
+    const main = document.getElementById('mainContent');
+    const urlMap = {
+        'price': '/fragment/price',
+        'map': '/fragment/map',
+        'shop': '/fragment/shop',
+        'welcome': '/fragment/welcome'
+    };
+    const baseUrl = urlMap[section];
+    if (!baseUrl) return;
+
+    const currentLang = new URL(window.location.href).searchParams.get('lang');
+    const fullUrl = currentLang ? `${baseUrl}?lang=${currentLang}` : baseUrl;
+
+    window.location.hash = section;
+
+    fetch(fullUrl)
+        .then(res => res.text())
+        .then(html => {
+            main.innerHTML = `<div id="messageArea" class="mb-3"></div>${html}`;
+            main.className = section === 'price' ? 'main-content text-start' : 'main-content text-center';
+
+            if (typeof bindAllEventHandlers === 'function') bindAllEventHandlers();
+            if (section === 'price') {
+                if (typeof markFavoriteButtons === 'function') markFavoriteButtons();
+                // ✅ 修正：改成 fragment 完成插入後再呼叫 loadPricePage()
+                setTimeout(() => {
+                    if (typeof loadPricePage === 'function') {
+                        loadPricePage(0);
+                    }
+                }, 0);
+            }
+        })
+        .catch(err => {
+            main.innerHTML = `<div class="text-danger">載入失敗：${err}</div>`;
+        });
+}
+
+
+function navigateAndReload(section) {
+    const url = new URL(window.location.href);
+    url.hash = section;
+    window.location.href = url.toString();
+}
+
+function switchLang() {
+    const url = new URL(window.location.href);
+    const currentLang = url.searchParams.get('lang');
+    const targetLang = currentLang === 'en' ? 'zh-TW' : 'en';
+    url.searchParams.set('lang', targetLang);
+
+    // 強制重新載入目前 hash 區塊
+    const hash = window.location.hash.replace('#', '') || 'welcome';
+    window.location.href = url.toString().split('#')[0] + '#' + hash;
+}
+
+
+function updateAnnouncement() {
+    const text = document.getElementById('announcementInput').value.trim();
+    const msgDiv = document.getElementById('announcementMessage');
+
+    if (!msgDiv) {
+        console.warn("❗ 找不到 #announcementMessage 元素");
+        return;
+    }
+
+    // 🟥 輸入為空，顯示錯誤
+    if (text.length === 0) {
+        msgDiv.className = 'text-danger fw-bold text-center mt-2';
+        msgDiv.innerText = window.i18n?.['announcement.empty'] || '❌ 請輸入公告內容';
+        return;
+    }
+
+    // ✅ 呼叫後端更新公告
+    fetch("/api/announcement", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            [csrfHeaderName]: csrfToken
+        },
+        body: JSON.stringify({ content: text })
+    })
+    .then(res => {
+        if (!res.ok) {
+            throw new Error(window.i18n?.['announcement.error'] || '❌ 更新失敗');
+        }
+
+        // 🟢 更新跑馬燈內容
+        document.getElementById('marqueeText').innerText = text;
+
+        // ✅ 成功訊息顯示
+        msgDiv.className = 'text-success fw-bold text-center mt-2';
+        msgDiv.innerText = window.i18n?.['announcement.updated'] || '✅ 公告已更新';
+    })
+    .catch(err => {
+        msgDiv.className = 'text-danger fw-bold text-center mt-2';
+        msgDiv.innerText = err.message || (window.i18n?.['announcement.error'] || '❌ 更新失敗');
+    });
+}
+
+// 初次載入
+document.addEventListener('DOMContentLoaded', () => {
+    // ✅ 一進來就載入語系
+    fetch('/api/i18n')
+        .then(res => res.json())
+        .then(data => {
+            window.i18n = data;
+        });
+
+    const hash = window.location.hash.replace('#', '');
+    const validSections = ['price', 'map', 'shop'];
+    if (validSections.includes(hash)) {
+        loadContent(hash);
+    } else {
+        loadContent('welcome');
+    }
+});
+
+
+window.addEventListener('hashchange', () => {
+    const hash = window.location.hash.replace('#', '');
+    const validSections = ['price', 'map', 'shop'];
+    if (validSections.includes(hash)) {
+        loadContent(hash);
+    }
+});
+
+
+</script>
+
+<script src="/js/dashboard-full.js"></script>
+</body>
+</html>

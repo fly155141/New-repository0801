@@ -1,0 +1,33 @@
+<th:block th:fragment="rows(dataList)">
+    <tr th:each="row : ${dataList}">
+        <td th:text="${row.id}"></td>
+        <td th:text="${row.startStation}"></td>
+        <td th:text="${row.endStation}"></td>
+        <td th:text="${row.fullPrice}"></td>
+        <td th:text="${row.discountPriceNewTaipei}"></td>
+        <td th:text="${row.discountPriceTaipei}"></td>
+        <td th:text="${row.distance}"></td>
+        <td th:text="${row.createdBy}"></td>
+        <td th:text="${#temporals.format(row.createdAt, 'yyyy-MM-dd HH:mm:ss')}"></td>
+        <td>
+            <sec:authorize access="hasRole('ADMIN')">
+                <button class="btn btn-sm btn-warning"
+                        th:text="#{table.edit}"
+                        th:onclick="|editData(${row.id})|">✏️編輯</button>
+                <button class="btn btn-sm btn-danger"
+                        th:text="#{table.delete}"
+                        th:onclick="|deleteData(${row.id})|">🗑️刪除</button>
+            </sec:authorize>
+
+            <sec:authorize access="isAuthenticated()">
+                <button type="button"
+                        class="btn btn-sm favorite-btn"
+                        th:classappend="${row.favorited} ? 'btn-danger' : 'btn-outline-danger'"
+                        th:attr="data-id=${row.id}, data-favorited=${row.favorited}"
+                        th:text="${row.favorited} ? #{favorite.saved} : #{favorite.label}"
+                        onclick="toggleFavorite(this)">
+                </button>
+            </sec:authorize>
+        </td>
+    </tr>
+</th:block>

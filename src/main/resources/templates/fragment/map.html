@@ -1,0 +1,1001 @@
+<div th:fragment="content">
+    <style>
+        /* ✅ CSS 整合 */
+        #mapArea {
+            width: 100%;
+            max-width: 1200px;
+            margin: auto;
+            background-color: #f8f9fa;
+            border: 1px solid #ccc;
+            position: relative;
+        }
+
+        #mrtMap {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        circle.station-dot {
+            fill: #2c3e50;
+            stroke: #ffffff;
+            stroke-width: 1.5px;
+            cursor: pointer;
+        }
+
+        circle.highlight-start {
+            fill: #28a745 !important;
+        }
+
+        circle.highlight-end {
+            fill: #dc3545 !important;
+        }
+
+        line.route-line {
+            stroke: #007bff;
+            stroke-width: 3px;
+            stroke-linecap: round;
+        }
+
+        text.station-label {
+            font-size: 12px;
+            font-family: 'Noto Sans CJK TC', sans-serif;
+            text-anchor: middle;
+            fill: #000;
+            pointer-events: none;
+        }
+
+        circle.station-dot:hover + text.station-label {
+            font-weight: bold;
+            fill: #007bff;
+        }
+    </style>
+
+    <div class="container-fluid">
+    <!-- ✅ 多國語系標題 -->
+    <h3 class="text-center mb-4" th:text="#{section.map}">自製地圖 - 收藏路線展示</h3>
+
+    <div class="row">
+        <!-- ✅ 我的收藏區塊 -->
+        <div class="col-md-4">
+    <h5 th:text="#{map.favorites}">我的收藏</h5>
+    <ul id="favoriteList" class="list-group">
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <span>永寧 ➜ 古亭</span>
+            <button type="button"
+        class="btn btn-sm btn-outline-primary show-route-btn"
+        onclick="showRoute('永寧', '古亭')"
+        th:text="#{map.showRoute}"
+        th:attr="data-default=#{map.showRoute}">
+    顯示路線
+</button>
+
+        </li>
+    </ul>
+</div>
+
+
+            <!-- 右側：地圖區 -->
+            <div class="col-md-8">
+  <div id="mapArea" style="width: 100%; overflow-x: auto; overflow-y: hidden; background-color: #f0f0f0; border: 1px solid #ccc;">
+    <div style="min-width: 1100px; max-width: none;">
+    
+           <svg id="mrtMap"
+           viewBox="11.38 53.33 1044.60 1139.31"
+   
+
+           preserveAspectRatio="xMidYMid meet"
+           xmlns="http://www.w3.org/2000/svg"
+           xmlns:dc="http://purl.org/dc/elements/1.1/"
+           xmlns:cc="http://creativecommons.org/ns#"
+           xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+           xmlns:xlink="http://www.w3.org/1999/xlink"
+           xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+           xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+           version="1.1"
+           style="width: 100%; height: auto;">
+
+
+
+<title id="title5247">Taipei MRT</title>
+<defs id="defs4"/>
+<sodipodi:namedview bordercolor="#666666" borderopacity="1.0" fit-margin-bottom="20" fit-margin-left="20" fit-margin-right="20" fit-margin-top="20" id="base" inkscape:current-layer="layer3" inkscape:cx="373.55872" inkscape:cy="639.88665" inkscape:document-units="px" inkscape:pageopacity="1" inkscape:pageshadow="2" inkscape:window-height="751" inkscape:window-maximized="1" inkscape:window-width="1280" inkscape:window-x="0" inkscape:window-y="1" inkscape:zoom="0.5" pagecolor="#ffffff" showgrid="false"/>
+<metadata id="metadata7">
+<rdf:RDF>
+<cc:Work rdf:about="">
+<dc:format>image/svg+xml</dc:format>
+<dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+<dc:title>Taipei MRT</dc:title>
+<dc:date>20130114</dc:date>
+<dc:creator>
+<cc:Agent>
+<dc:title>walkingice</dc:title>
+</cc:Agent>
+</dc:creator>
+<dc:rights>
+<cc:Agent>
+<dc:title/>
+</cc:Agent>
+</dc:rights>
+<dc:description>Licensed under CC-BY-SA.
+
+You are able to remove license logo and author's name from the image if you keep them in this metadata.</dc:description>
+<cc:license rdf:resource="http://creativecommons.org/licenses/by-sa/3.0/"/>
+</cc:Work>
+<cc:License rdf:about="http://creativecommons.org/licenses/by-sa/3.0/">
+<cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"/>
+<cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"/>
+<cc:requires rdf:resource="http://creativecommons.org/ns#Notice"/>
+<cc:requires rdf:resource="http://creativecommons.org/ns#Attribution"/>
+<cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"/>
+<cc:requires rdf:resource="http://creativecommons.org/ns#ShareAlike"/>
+</cc:License>
+</rdf:RDF>
+</metadata>
+<g id="layer4" inkscape:groupmode="layer" inkscape:label="symbols">
+<g id="layer1-4" inkscape:label="Layer 1" style="display:inline" transform="matrix(0.57142858,0,0,0.57142858,11.379829,1160.012)">
+<g id="g287" inkscape:export-filename="/mnt/hgfs/Bov/Documents/Work/2007/cc/identity/srr buttons/big/by-sa.png" inkscape:export-xdpi="300.23013" inkscape:export-ydpi="300.23013" transform="matrix(0.9937807,0,0,0.9936694,-177.69409,-74.436409)">
+<path d="m 182.23532,75.39014 114.06396,0.20312 c 1.59375,0 3.01758,-0.23682 3.01758,3.18018 l -0.13965,37.56689 -119.82031,0 0,-37.70654 c 0,-1.68457 0.16309,-3.24365 2.87842,-3.24365 z" id="path3817_2_" inkscape:connector-curvature="0" nodetypes="ccccccc" style="fill:#aab2ab"/>
+<g id="g5908_2_" transform="matrix(0.872921,0,0,0.872921,50.12536,143.2144)">
+<path cx="296.35416" cy="264.3577" d="m 187.20944,-55.6792 c 0.006,8.68024 -7.02786,15.72095 -15.7081,15.72708 -8.68021,0.005 -15.72205,-7.02786 -15.72708,-15.70804 0,-0.0067 0,-0.01233 0,-0.01904 -0.005,-8.68134 7.02783,-15.72205 15.70807,-15.72711 8.68134,-0.0056 15.72208,7.02789 15.72711,15.70807 0,0.0056 0,0.01233 0,0.01904 z" id="path5906_2_" inkscape:connector-curvature="0" rx="22.939548" ry="22.939548" style="fill:#ffffff" type="arc"/>
+<g id="g5706_2_" transform="translate(-289.6157,99.0653)">
+<path d="m 473.88455,-167.54724 c 3.48541,3.48596 5.22839,7.75391 5.22839,12.80273 0,5.04938 -1.7128,9.27148 -5.13834,12.66736 -3.63531,3.5766 -7.93179,5.36432 -12.88947,5.36432 -4.89777,0 -9.11987,-1.77261 -12.6651,-5.31955 -3.54584,-3.54581 -5.31845,-7.78299 -5.31845,-12.71213 0,-4.92859 1.77261,-9.19598 5.31845,-12.80273 3.4552,-3.48651 7.67725,-5.22894 12.6651,-5.22894 5.04829,0 9.31401,1.74243 12.79942,5.22894 z m -23.11798,2.34485 c -2.94675,2.97638 -4.41956,6.46289 -4.41956,10.46234 0,3.99835 1.45828,7.4552 4.37424,10.37067 2.91653,2.9165 6.38849,4.37476 10.41705,4.37476 4.02853,0 7.53018,-1.47281 10.50656,-4.41901 2.8259,-2.73584 4.23941,-6.17706 4.23941,-10.32642 0,-4.11804 -1.43646,-7.61292 -4.30768,-10.48474 -2.87064,-2.87067 -6.34988,-4.30652 -10.43829,-4.30652 -4.08837,0 -7.54638,1.44318 -10.37173,4.32892 z m 7.75449,8.70312 c -0.45032,-0.98163 -1.12433,-1.47223 -2.02325,-1.47223 -1.58914,0 -2.38342,1.06952 -2.38342,3.2085 0,2.13959 0.79428,3.20911 2.38342,3.20911 1.04938,0 1.79895,-0.5213 2.24866,-1.56512 l 2.20276,1.17303 c -1.04993,1.86548 -2.62506,2.79901 -4.72549,2.79901 -1.6199,0 -2.91763,-0.4967 -3.89206,-1.48956 -0.97607,-0.99341 -1.46274,-2.36273 -1.46274,-4.10797 0,-1.71558 0.50229,-3.07709 1.50748,-4.08563 1.00519,-1.00793 2.25705,-1.51251 3.75781,-1.51251 2.22012,0 3.80984,0.87488 4.77081,2.62286 l -2.38398,1.22051 z m 10.36334,0 c -0.45087,-0.98163 -1.11148,-1.47223 -1.98239,-1.47223 -1.62106,0 -2.43213,1.06952 -2.43213,3.2085 0,2.13959 0.81107,3.20911 2.43213,3.20911 1.05103,0 1.78717,-0.5213 2.20724,-1.56512 l 2.25201,1.17303 c -1.04825,1.86548 -2.62119,2.79901 -4.71768,2.79901 -1.61771,0 -2.91263,-0.4967 -3.88647,-1.48956 -0.97217,-0.99341 -1.45938,-2.36273 -1.45938,-4.10797 0,-1.71558 0.49448,-3.07709 1.48288,-4.08563 0.98782,-1.00793 2.24527,-1.51251 3.77347,-1.51251 2.21619,0 3.80368,0.87488 4.76132,2.62286 l -2.431,1.22051 z" id="path5708_2_" inkscape:connector-curvature="0"/>
+</g>
+</g>
+<path d="m 297.29639,74.91064 -116.22951,0 c -1.24658,0 -2.26074,1.01465 -2.26074,2.26123 l 0,39.49561 c 0,0.28174 0.22852,0.51074 0.51025,0.51074 l 119.73,0 c 0.28174,0 0.51074,-0.229 0.51074,-0.51074 l 0,-39.4956 c 0,-1.24659 -1.01416,-2.26124 -2.26074,-2.26124 z m -116.22951,1.02149 116.22951,0 c 0.68359,0 1.23926,0.55615 1.23926,1.23975 0,0 0,15.91943 0,27.41846 l -83.07375,0 c -3.04492,5.50537 -8.91113,9.24365 -15.64355,9.24365 -6.73535,0 -12.6001,-3.73486 -15.64355,-9.24365 l -4.34814,0 c 0,-11.49902 0,-27.41846 0,-27.41846 -2e-5,-0.6836 0.55663,-1.23975 1.24022,-1.23975 z" id="path294" inkscape:connector-curvature="0"/>
+<g enable-background="new    " id="g296">
+<path d="m 265.60986,112.8833 c 0.0801,0.15576 0.1875,0.28174 0.32129,0.37842 0.13379,0.0962 0.29004,0.16797 0.46973,0.21436 0.18066,0.0469 0.36719,0.0703 0.55957,0.0703 0.12988,0 0.26953,-0.0107 0.41895,-0.0327 0.14844,-0.0215 0.28809,-0.064 0.41895,-0.12598 0.12988,-0.062 0.23926,-0.14795 0.3252,-0.25684 0.0879,-0.10889 0.13086,-0.24707 0.13086,-0.41553 0,-0.18018 -0.0576,-0.32617 -0.17285,-0.43848 -0.11426,-0.1123 -0.26562,-0.20508 -0.45215,-0.28027 -0.18555,-0.0742 -0.39746,-0.13965 -0.63281,-0.1958 -0.23633,-0.0562 -0.47559,-0.11816 -0.71777,-0.18701 -0.24902,-0.062 -0.49121,-0.13818 -0.72754,-0.22852 -0.23535,-0.0898 -0.44727,-0.20703 -0.63379,-0.3501 -0.18652,-0.14307 -0.33691,-0.32178 -0.45215,-0.53662 -0.11426,-0.21484 -0.17188,-0.47461 -0.17188,-0.7793 0,-0.34277 0.0732,-0.63965 0.21875,-0.8916 0.14648,-0.25195 0.33789,-0.46191 0.57422,-0.63037 0.23535,-0.16797 0.50293,-0.29248 0.80176,-0.37354 0.29785,-0.0806 0.59668,-0.12109 0.89453,-0.12109 0.34863,0 0.68262,0.0391 1.00293,0.11719 0.31934,0.0776 0.60449,0.2041 0.85254,0.37842 0.24902,0.17432 0.44629,0.39697 0.59277,0.66797 0.14551,0.271 0.21875,0.59961 0.21875,0.98535 l -1.42188,0 c -0.0127,-0.19922 -0.0547,-0.36426 -0.125,-0.49463 -0.0713,-0.13086 -0.16602,-0.2334 -0.2832,-0.30859 -0.11816,-0.0742 -0.25293,-0.12744 -0.4043,-0.1582 -0.15234,-0.0312 -0.31738,-0.0469 -0.49707,-0.0469 -0.11719,0 -0.23535,0.0127 -0.35254,0.0371 -0.11816,0.0254 -0.22461,0.0688 -0.32031,0.13086 -0.0967,0.0625 -0.17578,0.14014 -0.2373,0.2334 -0.0615,0.0937 -0.0928,0.21191 -0.0928,0.35498 0,0.13086 0.0244,0.23682 0.0742,0.31738 0.0498,0.0811 0.14844,0.15576 0.29395,0.22412 0.14551,0.0684 0.34766,0.13721 0.60547,0.20557 0.25781,0.0684 0.59473,0.15576 1.01172,0.26123 0.12402,0.0249 0.2959,0.0703 0.5166,0.13574 0.2207,0.0654 0.43945,0.16943 0.65723,0.3125 0.21777,0.14355 0.40527,0.33496 0.56445,0.57422 0.1582,0.23975 0.2373,0.54639 0.2373,0.91992 0,0.30518 -0.0596,0.58838 -0.17773,0.84961 -0.11816,0.26172 -0.29395,0.4873 -0.52734,0.67676 -0.2334,0.19043 -0.52246,0.33789 -0.86719,0.44385 -0.3457,0.10596 -0.74609,0.15869 -1.19922,0.15869 -0.36719,0 -0.72363,-0.0454 -1.06934,-0.13574 -0.34473,-0.0903 -0.65039,-0.23242 -0.91504,-0.42578 -0.26367,-0.19336 -0.47363,-0.43994 -0.62988,-0.73877 -0.15527,-0.29932 -0.22949,-0.65381 -0.22363,-1.06494 l 1.42188,0 c -3e-5,0.22412 0.04,0.41406 0.12106,0.56933 z" id="path298" inkscape:connector-curvature="0" style="fill:#ffffff"/>
+<path d="m 273.8667,107.8667 2.49316,6.66406 -1.52246,0 -0.50391,-1.48438 -2.49316,0 -0.52246,1.48438 -1.47461,0 2.52051,-6.66406 1.50293,0 z m 0.084,4.08594 -0.83984,-2.44336 -0.0186,0 -0.86914,2.44336 1.72753,0 z" id="path300" inkscape:connector-curvature="0" style="fill:#ffffff"/>
+</g>
+<g enable-background="new    " id="g302">
+<path d="m 239.17821,107.8667 c 0.31738,0 0.60742,0.0283 0.86914,0.084 0.26172,0.0561 0.48633,0.14795 0.67383,0.27539 0.18652,0.12744 0.33203,0.29688 0.43457,0.5083 0.10254,0.21142 0.1543,0.47266 0.1543,0.78369 0,0.33594 -0.0762,0.61523 -0.22949,0.83936 -0.15234,0.22412 -0.37891,0.40723 -0.67773,0.55029 0.41211,0.11816 0.71973,0.3252 0.92285,0.62109 0.20312,0.29589 0.30469,0.65234 0.30469,1.06934 0,0.33594 -0.0654,0.62695 -0.19629,0.87305 -0.13086,0.24561 -0.30762,0.44629 -0.52832,0.60205 -0.22168,0.15576 -0.47461,0.271 -0.75781,0.34521 -0.28418,0.0752 -0.5752,0.1123 -0.875,0.1123 l -3.23633,0 0,-6.66406 3.14159,0 0,1e-5 z m -0.1875,2.69531 c 0.26172,0 0.47656,-0.062 0.64551,-0.18604 0.16797,-0.12451 0.25195,-0.32568 0.25195,-0.60498 0,-0.15527 -0.0283,-0.28271 -0.084,-0.38184 -0.0566,-0.0996 -0.13086,-0.17676 -0.22461,-0.23291 -0.0937,-0.0557 -0.20117,-0.0947 -0.32227,-0.11621 -0.12207,-0.022 -0.24805,-0.0327 -0.37891,-0.0327 l -1.37305,0 0,1.55469 1.48536,0 z m 0.0859,2.82813 c 0.14355,0 0.28027,-0.0137 0.41113,-0.042 0.13086,-0.0278 0.24707,-0.0747 0.34668,-0.13965 0.0996,-0.0654 0.17871,-0.1543 0.23828,-0.26611 0.0596,-0.11181 0.0889,-0.25488 0.0889,-0.4292 0,-0.3418 -0.0967,-0.58594 -0.29004,-0.73193 -0.19336,-0.14599 -0.44922,-0.21924 -0.7666,-0.21924 l -1.59961,0 0,1.82812 1.57129,0 z" id="path304" inkscape:connector-curvature="0" style="fill:#ffffff"/>
+<path d="m 241.88914,107.8667 1.64355,0 1.56055,2.63184 1.55078,-2.63184 1.63379,0 -2.47363,4.10645 0,2.55762 -1.46875,0 0,-2.59473 -2.44629,-4.06934 z" id="path306" inkscape:connector-curvature="0" style="fill:#ffffff"/>
+</g>
+<g id="g6316_1_" transform="matrix(0.624995,0,0,0.624995,391.2294,176.9332)">
+<path cx="475.97119" cy="252.08646" d="m -175.0083,-139.1153 c 0.006,9.4118 -7.61725,17.04779 -17.02982,17.05481 -9.41101,0.007 -17.047,-7.61725 -17.05481,-17.02979 0,-0.008 0,-0.0172 0,-0.025 -0.006,-9.41254 7.6188,-17.047 17.02982,-17.05481 9.41257,-0.007 17.04855,7.61804 17.05481,17.02985 0,0.009 0,0.0164 0,0.025 z" id="path6318_1_" inkscape:connector-curvature="0" rx="29.209877" ry="29.209877" style="fill:#ffffff" type="arc"/>
+<g id="g6320_1_" transform="translate(-23.9521,-89.72962)">
+<path d="m -168.2204,-68.05536 c -5.17194,0 -9.54852,1.80469 -13.13135,5.41333 -3.67661,3.73444 -5.51413,8.1532 -5.51413,13.25635 0,5.10315 1.83752,9.49152 5.51413,13.1626 3.67502,3.67194 8.05316,5.50787 13.13135,5.50787 5.14066,0 9.59537,-1.85156 13.36728,-5.55475 3.55005,-3.51562 5.3266,-7.88831 5.3266,-13.11572 0,-5.22662 -1.8078,-9.64697 -5.42191,-13.25635 -3.61407,-3.60864 -8.03756,-5.41333 -13.27197,-5.41333 z m 0.0469,3.36017 c 4.23752,0 7.836,1.49298 10.79697,4.48053 2.98907,2.9563 4.48441,6.56567 4.48441,10.82898 0,4.29382 -1.46252,7.85712 -4.39224,10.68915 -3.08438,3.04926 -6.71411,4.57349 -10.88913,4.57349 -4.17505,0 -7.7735,-1.5094 -10.79541,-4.52661 -3.02188,-3.01953 -4.53284,-6.59692 -4.53284,-10.73602 0,-4.13831 1.52658,-7.74847 4.57971,-10.82898 2.92815,-2.98756 6.51098,-4.48054 10.74853,-4.48054 z" id="path6322_1_" inkscape:connector-curvature="0"/>
+<path d="m -176.49548,-52.02087 c 0.74377,-4.69769 4.05161,-7.20862 8.1954,-7.20862 5.96097,0 9.59225,4.32501 9.59225,10.09229 0,5.62738 -3.86411,9.99927 -9.686,9.99927 -4.00473,0 -7.58914,-2.46484 -8.24228,-7.30084 l 4.70319,0 c 0.14062,2.51099 1.77032,3.39459 4.09845,3.39459 2.65317,0 4.37817,-2.4649 4.37817,-6.23291 0,-3.95233 -1.49063,-6.04535 -4.28598,-6.04535 -2.04846,0 -3.8172,0.74457 -4.19064,3.30157 l 1.36874,-0.007 -3.70316,3.7016 -3.7016,-3.7016 1.47346,0.007 z" id="path6324_1_" inkscape:connector-curvature="0"/>
+</g>
+</g>
+<g id="g313">
+<circle cx="242.56226" cy="90.224609" id="circle315" r="10.8064" style="fill:#ffffff"/>
+<g id="g317">
+<path d="m 245.68994,87.09766 c 0,-0.4165 -0.33789,-0.75342 -0.75391,-0.75342 l -4.77246,0 c -0.41602,0 -0.75391,0.33691 -0.75391,0.75342 l 0,4.77295 1.33105,0 0,5.65234 3.61719,0 0,-5.65234 1.33203,0 0,-4.77295 1e-5,0 z" id="path319" inkscape:connector-curvature="0"/>
+<circle cx="242.5498" cy="84.083008" id="circle321" r="1.63232"/>
+</g>
+<path d="m 242.53467,78.31836 c -3.23145,0 -5.96826,1.12744 -8.20752,3.38379 -2.29785,2.33301 -3.44629,5.09521 -3.44629,8.28418 0,3.18897 1.14844,5.93213 3.44629,8.22705 2.29785,2.29443 5.03418,3.44189 8.20752,3.44189 3.21289,0 5.99805,-1.15674 8.35352,-3.47168 2.2207,-2.19678 3.33008,-4.92969 3.33008,-8.19727 0,-3.26758 -1.12891,-6.02881 -3.3877,-8.28418 -2.25879,-2.25634 -5.02442,-3.38378 -8.2959,-3.38378 z m 0.0293,2.09961 c 2.64844,0 4.89746,0.93359 6.74707,2.80078 1.87012,1.84717 2.80469,4.10352 2.80469,6.76758 0,2.68359 -0.91504,4.91113 -2.74609,6.68066 -1.92773,1.90576 -4.19629,2.8584 -6.80566,2.8584 -2.60937,0 -4.8584,-0.94287 -6.74658,-2.82959 -1.88965,-1.88623 -2.8335,-4.12256 -2.8335,-6.70947 0,-2.58643 0.9541,-4.84229 2.8623,-6.76758 1.83057,-1.86719 4.07031,-2.80078 6.71777,-2.80078 z" id="path323" inkscape:connector-curvature="0" style="clip-rule:evenodd;fill-rule:evenodd"/>
+</g>
+</g>
+</g>
+<text id="text5239" sodipodi:linespacing="125%" style="display:inline;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.6138401px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none" transform="translate(62.091414,104.50999)" x="-49.710228" xml:space="preserve" y="1086.1346"><tspan id="tspan5241" sodipodi:role="line" x="-49.710228" y="1086.1346">created by walkingice</tspan></text>
+<g id="g4504" style="display:inline" transform="matrix(0.79631174,0,0,0.79631174,249.90181,50.020686)">
+<circle cx="531" cy="53.577026" id="path4498" r="46.5" style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" transform="matrix(0.52754855,0,0,0.52754855,184.9056,64.395918)"/>
+<path d="m 482.18379,109.56468 c -11.43327,-6.33826 -22.86654,-7.00307 -34.29981,0 l 17.14991,-40.286368 z" id="path4495" inkscape:connector-curvature="0" inkscape:transform-center-y="-6.7143949" sodipodi:nodetypes="cccc" style="fill:#000000;fill-opacity:1;stroke:none"/>
+<text id="text4500" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;line-height:125%;font-family:'Serto Batnan';-inkscape-font-specification:'Serto Batnan';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none" x="457.85388" xml:space="preserve" y="58.964176"><tspan id="tspan4502" sodipodi:role="line" x="457.85388" y="58.964176">N</tspan></text>
+</g>
+</g>
+<g id="layer1" inkscape:groupmode="layer" inkscape:label="lines" style="display:inline" transform="translate(62.091414,104.50999)">
+<path d="m 155.20974,-34.538903 27.78573,27.78574 0,83.361446 144.2775,0 100.81103,104.811017 0,510.25268" id="path3004" inkscape:connector-curvature="0" sodipodi:nodetypes="cccccc" style="fill:none;stroke:#ef2929;stroke-width:8;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"/>
+<path d="m 786.94564,487.65273 -466.53809,-0.63403 -0.23739,165.16847 111.31604,32.74321 96.44589,124.46452 0,231.6777" id="path3846" inkscape:connector-curvature="0" sodipodi:nodetypes="cccccc" style="fill:none;stroke:#4e9a06;stroke-width:8;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"/>
+<path d="m 985.10178,457.19338 c 0,0 -80.9716,99.58806 -85.21424,102.03755 -4.24265,2.44949 -583.53861,0 -583.53861,0 l -38.5695,27.25579 -47.69752,0 -123.43523,71.26536 0,244.96309" id="path3908" inkscape:connector-curvature="0" sodipodi:nodetypes="csccccc" style="fill:none;stroke:#3465a4;stroke-width:8;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"/>
+<path d="m 128.32959,264.85818 193.2072,139.55703 201.76041,0 0,278.77686 -157.52186,144.64571 0,109.31475" id="path3960" inkscape:connector-curvature="0" sodipodi:nodetypes="cccccc" style="display:inline;fill:none;stroke:#ffc600;stroke-width:8;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"/>
+<path d="M 323.38238,406.47968 -6.7379086,567.57305" id="path3965" inkscape:connector-curvature="0" sodipodi:nodetypes="cc" style="fill:none;stroke:#ffc600;stroke-width:8;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"/>
+<path d="m 986.36049,451.65125 0,-145 -67,-149 -340.02147,0 0,91.76924 61.02147,35.23076 0,50 -19,19 0,404.59186 114,0 0,103.78828 167.57482,0" id="path4011" inkscape:connector-curvature="0" sodipodi:nodetypes="cccccccccccc" style="fill:none;stroke:#c17d11;stroke-width:8;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"/>
+<path d="m 527.93209,966.39487 c -8,0 -71,0 -71,0" id="path4061" inkscape:connector-curvature="0" sodipodi:nodetypes="cc" style="fill:none;stroke:#bbe48e;stroke-width:8;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"/>
+<path d="m 330.06257,68.467488 0,-37.000001 56,0" id="path4063" inkscape:connector-curvature="0" sodipodi:nodetypes="ccc" style="fill:none;stroke:#ff9797;stroke-width:8;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"/>
+<path d="m 920.37435,891.96504 c 1.38397,5.16507 39.82884,68.98556 39.82884,68.98556 l -58.42164,58.4218" id="path4065" inkscape:connector-curvature="0" style="fill:none;stroke:#7ed238;stroke-width:8;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"/>
+<path d="m 432.94113,684.83682 409.71824,0" id="path4109" inkscape:connector-curvature="0" sodipodi:nodetypes="cc" style="fill:#ef2929;fill-opacity:1;stroke:#ef2929;stroke-width:8;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"/>
+</g>
+<g id="layer2" inkscape:groupmode="layer" inkscape:label="nodes" style="display:inline" transform="translate(62.091414,104.50999)">
+<use height="1052.3622" id="use3850" transform="translate(75.93476,155.32559)" width="744.09448" x="0" xlink:href="#use3842" y="0"/>
+<use height="1052.3622" id="use3852" transform="translate(24.219974,32.418059)" width="744.09448" x="0" xlink:href="#use3850" y="0"/>
+<use height="1052.3622" id="use3854" transform="translate(4.3247718e-7,38.842819)" width="744.09448" x="0" xlink:href="#use3852" y="0"/>
+<use height="1052.3622" id="use3856" transform="translate(4.3247718e-7,38.842819)" width="744.09448" x="0" xlink:href="#use3854" y="0"/>
+<use height="1052.3622" id="use3858" transform="translate(4.3247718e-7,38.84282)" width="744.09448" x="0" xlink:href="#use3856" y="0"/>
+<g id="use3860" transform="matrix(0.86808574,0,0,0.86808574,274.96253,825.611)">
+<circle cx="292.83438" cy="162.85481" id="circle4591" r="18.951704" style="fill:#000000;fill-opacity:1;stroke:none" transform="translate(-1.5130064,-2.7356926)"/>
+<circle cx="292.83438" cy="162.85481" id="circle4593" r="18.951704" style="fill:#000000;fill-opacity:1;stroke:#ffffff;stroke-width:9.91770077;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" transform="matrix(0.60497891,0,0,0.60497891,114.16275,61.595393)"/>
+</g>
+<use height="1052.3622" id="use3862" transform="translate(4.3247718e-7,77.685661)" width="744.09448" x="0" xlink:href="#use3858" y="0"/>
+<circle cx="527.85443" cy="1042.2938" id="path3864" r="14.229013" style="fill:#4e9a06;fill-opacity:1;stroke:none"/>
+<use height="1052.3622" id="use3802" transform="translate(68.14296,29.344573)" width="744.09448" x="0" xlink:href="#use3792" y="0"/>
+<use height="1052.3622" id="use3804" transform="translate(26.785734,30.00843)" width="744.09448" x="0" xlink:href="#use3802" y="0"/>
+<use height="1052.3622" id="use3806" transform="translate(27.785734,29.00843)" width="744.09448" x="0" xlink:href="#use3804" y="0"/>
+<use height="1052.3622" id="use3824" transform="translate(15.788016,32)" width="744.09448" x="0" xlink:href="#use3806" y="0"/>
+<use height="1052.3622" id="use3826" transform="translate(4.3247718e-7,40.232638)" width="744.09448" x="0" xlink:href="#use3824" y="0"/>
+<use height="1052.3622" id="use3828" transform="translate(4.3247718e-7,41.646789)" width="744.09448" x="0" xlink:href="#use3826" y="0"/>
+<use height="1052.3622" id="use3830" transform="translate(4.3247718e-7,41.646844)" width="744.09448" x="0" xlink:href="#use3828" y="0"/>
+<use height="1052.3622" id="use3832" transform="translate(4.3247718e-7,41.646796)" width="744.09448" x="0" xlink:href="#use3830" y="0"/>
+<use height="1052.3622" id="use3836" transform="translate(4.3247718e-7,78.697495)" width="744.09448" x="0" xlink:href="#use3832" y="0"/>
+<circle cx="427.69971" cy="621.49316" id="use3842" r="7.1416264" style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.83441579;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"/>
+<circle cx="152.98492" cy="-36.947361" id="path3774" r="14.229013" style="fill:#ef2929;fill-opacity:1;stroke:none"/>
+<circle cx="182.33344" cy="-6.5334001" id="use3784" r="7.1416264" style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.83441579;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"/>
+<use height="1052.3622" id="use3788" transform="translate(4.3247718e-7,82.903407)" width="744.09448" x="0" xlink:href="#use3784" y="0"/>
+<use height="1052.3622" id="use3790" transform="translate(52.901584,0)" width="744.09448" x="0" xlink:href="#use3788" y="0"/>
+<use height="1052.3622" id="use3792" transform="translate(53.962234,0)" width="744.09448" x="0" xlink:href="#use3790" y="0"/>
+<use height="1052.3622" id="use3818" transform="translate(4.3247718e-7,38)" width="744.09448" x="0" xlink:href="#use3784" y="0"/>
+<circle cx="106.20016" cy="901.32721" id="path3910" r="14.229013" style="fill:#3465a4;fill-opacity:1;stroke:none"/>
+<circle cx="280.23419" cy="585.13275" id="use3914" r="7.1416264" style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.83441579;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"/>
+<use height="1052.3622" id="use3916" transform="translate(-51.169033,0.5)" width="744.09448" x="0" xlink:href="#use3914" y="0"/>
+<use height="1052.3622" id="use3918" transform="translate(-41.955009,23.718407)" width="744.09448" x="0" xlink:href="#use3916" y="0"/>
+<use height="1052.3622" id="use3920" transform="translate(-41.955003,23.864855)" width="744.09448" x="0" xlink:href="#use3918" y="0"/>
+<use height="1052.3622" id="use3922" transform="translate(-38.95501,26.713203)" width="744.09448" x="0" xlink:href="#use3920" y="0"/>
+<use height="1052.3622" id="use3924" transform="translate(4.3247718e-7,52.849492)" width="744.09448" x="0" xlink:href="#use3922" y="0"/>
+<use height="1052.3622" id="use3926" transform="translate(4.3247718e-7,52.849511)" width="744.09448" x="0" xlink:href="#use3924" y="0"/>
+<use height="1052.3622" id="use3928" transform="translate(4.3247718e-7,45.071332)" width="744.09448" x="0" xlink:href="#use3926" y="0"/>
+<circle cx="475.17313" cy="559.67694" id="use3930" r="7.1416264" style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.83441579;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"/>
+<use height="1052.3622" id="use3936" transform="translate(193.90067,0)" width="744.09448" x="0" xlink:href="#use3930" y="0"/>
+<use height="1052.3622" id="use3938" transform="translate(48.473394,0)" width="744.09448" x="0" xlink:href="#use3936" y="0"/>
+<use height="1052.3622" id="use3940" transform="translate(48.473474,0)" width="744.09448" x="0" xlink:href="#use3938" y="0"/>
+<use height="1052.3622" id="use3942" transform="translate(48.473424,0)" width="744.09448" x="0" xlink:href="#use3940" y="0"/>
+<use height="1052.3622" id="use3944" transform="translate(48.473414,0)" width="744.09448" x="0" xlink:href="#use3942" y="0"/>
+<use height="1052.3622" id="use3946" transform="translate(54.98948,-21.878443)" width="744.09448" x="0" xlink:href="#use3944" y="0"/>
+<use height="1052.3622" id="use3948" transform="translate(34.406704,-40.294009)" width="744.09448" x="0" xlink:href="#use3946" y="0"/>
+<circle cx="121.98494" cy="261.44812" id="path3956" r="14.229013" style="fill:#ffc600;fill-opacity:1;stroke:none"/>
+<circle cx="-5.7855821" cy="567.95862" id="path3958" r="14.229013" style="fill:#ffc600;fill-opacity:1;stroke:none"/>
+<use height="1052.3622" id="use3967" transform="translate(-195.52726,182.45514)" width="744.09448" x="0" xlink:href="#use3802" y="0"/>
+<use height="1052.3622" id="use3971" transform="translate(39.828054,28.143194)" width="744.09448" x="0" xlink:href="#use3967" y="0"/>
+<use height="1052.3622" id="use3973" transform="translate(39.828044,30.885812)" width="744.09448" x="0" xlink:href="#use3971" y="0"/>
+<use height="1052.3622" id="use3975" transform="translate(39.828064,27.736325)" width="744.09448" x="0" xlink:href="#use3973" y="0"/>
+<use height="1052.3622" id="use3977" transform="translate(1.2928924,51.997474)" width="744.09448" x="0" xlink:href="#use3975" y="0"/>
+<use height="1052.3622" id="use3979" transform="translate(-38.064999,19.471211)" width="744.09448" x="0" xlink:href="#use3977" y="0"/>
+<use height="1052.3622" id="use3981" transform="translate(-38.064961,17.703442)" width="744.09448" x="0" xlink:href="#use3979" y="0"/>
+<use height="1052.3622" id="use3983" transform="translate(-38.064974,18.410639)" width="744.09448" x="0" xlink:href="#use3981" y="0"/>
+<use height="1052.3622" id="use3985" transform="translate(-38.064985,17.471179)" width="744.09448" x="0" xlink:href="#use3983" y="0"/>
+<use height="1052.3622" id="use3987" transform="translate(-33.115231,15.935675)" width="744.09448" x="0" xlink:href="#use3985" y="0"/>
+<use height="1052.3622" id="use3989" transform="translate(59.154324,41.124891)" width="744.09448" x="0" xlink:href="#use3832" y="0"/>
+<use height="1052.3622" id="use3991" transform="translate(36.305084,31.384776)" width="744.09448" x="0" xlink:href="#use3989" y="0"/>
+<circle cx="413.20401" cy="784.98132" id="use3997" r="7.1416264" style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.83441579;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"/>
+<use height="1052.3622" id="use3999" transform="translate(-46.604813,39.946932)" width="744.09448" x="0" xlink:href="#use3997" y="0"/>
+<use height="1052.3622" id="use4001" transform="translate(0,55.856844)" width="744.09448" x="0" xlink:href="#use3999" y="0"/>
+<use height="1052.3622" id="use4003" transform="translate(372.38481,368.68331)" width="744.09448" x="0" xlink:href="#path3958" y="0"/>
+<circle cx="907.37274" cy="861.2688" id="path4005" r="14.229013" style="fill:#c17d11;fill-opacity:1;stroke:none"/>
+<use height="1052.3622" id="use4013" transform="translate(-96.662818,123.99878)" width="744.09448" x="0" xlink:href="#use3936" y="0"/>
+<use height="1052.3622" id="use4015" transform="translate(50.845264,48.593087)" width="744.09448" x="0" xlink:href="#use4013" y="0"/>
+<use height="1052.3622" id="use4017" transform="translate(66.000004,26)" width="744.09448" x="0" xlink:href="#use4015" y="0"/>
+<use height="1052.3622" id="use4019" transform="translate(47.500004,25)" width="744.09448" x="0" xlink:href="#use4017" y="0"/>
+<use height="1052.3622" id="use4021" transform="translate(4.3247718e-7,36)" width="744.09448" x="0" xlink:href="#use4019" y="0"/>
+<use height="1052.3622" id="use4023" transform="translate(4.3247718e-7,43)" width="744.09448" x="0" xlink:href="#use4021" y="0"/>
+<use height="1052.3622" id="use4025" transform="translate(56.538824,-1)" width="744.09448" x="0" xlink:href="#use4023" y="0"/>
+<use height="1052.3622" id="use4027" transform="translate(57.038824,0)" width="744.09448" x="0" xlink:href="#use4025" y="0"/>
+<circle cx="622.07379" cy="403.67697" id="use4031" r="7.1416264" style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.83441579;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"/>
+<use height="1052.3622" id="use4033" transform="translate(18.756424,-94.000003)" width="744.09448" x="0" xlink:href="#use4031" y="0"/>
+<use height="1052.3622" id="use4035" transform="translate(-61.646446,-91.000003)" width="744.09448" x="0" xlink:href="#use4033" y="0"/>
+<use height="1052.3622" id="use4037" transform="translate(14.525126,-61)" width="744.09448" x="0" xlink:href="#use4035" y="0"/>
+<use height="1052.3622" id="use4039" transform="translate(71.249994,0)" width="744.09448" x="0" xlink:href="#use4037" y="0"/>
+<use height="1052.3622" id="use4041" transform="translate(71.249994,-1)" width="744.09448" x="0" xlink:href="#use4039" y="0"/>
+<use height="1052.3622" id="use4043" transform="translate(71.249994,1)" width="744.09448" x="0" xlink:href="#use4041" y="0"/>
+<use height="1052.3622" id="use4045" transform="translate(71.249994,0)" width="744.09448" x="0" xlink:href="#use4043" y="0"/>
+<use height="1052.3622" id="use4047" transform="translate(59.999994,45)" width="744.09448" x="0" xlink:href="#use4045" y="0"/>
+<use height="1052.3622" id="use4049" transform="translate(21,48)" width="744.09448" x="0" xlink:href="#use4047" y="0"/>
+<use height="1052.3622" id="use4051" transform="translate(26.000004,59)" width="744.09448" x="0" xlink:href="#use4049" y="0"/>
+<use height="1052.3622" id="use4053" transform="translate(0.06318353,76.133173)" width="744.09448" x="0" xlink:href="#use4051" y="0"/>
+<circle cx="390.06821" cy="30.044018" id="path4055" r="14.229013" style="fill:#ff9797;fill-opacity:1;stroke:none"/>
+<circle cx="458.45749" cy="963.84045" id="path4057" r="14.229013" style="fill:#bbe48e;fill-opacity:1;stroke:none"/>
+<use height="1052.3622" id="use4067" transform="translate(-106.89786,30.481863)" width="744.09448" x="0" xlink:href="#use3842" y="0"/>
+<use height="1052.3622" id="use4069" transform="translate(71.648964,33.721929)" width="744.09448" x="0" xlink:href="#use4027" y="0"/>
+<use height="1052.3622" id="use4071" transform="translate(23.000004,39)" width="744.09448" x="0" xlink:href="#use4069" y="0"/>
+<use height="1052.3622" id="use4073" transform="translate(-8.0000006,50)" width="744.09448" x="0" xlink:href="#use4071" y="0"/>
+<use height="1052.3622" id="use4075" transform="translate(-35,34)" width="744.09448" x="0" xlink:href="#use4073" y="0"/>
+<use height="1052.3622" id="use4124" transform="translate(31.632794,123.99878)" width="744.09448" x="0" xlink:href="#use3936" y="0"/>
+<use height="1052.3622" id="use4126" transform="translate(99.032339,124.70589)" width="744.09448" x="0" xlink:href="#use3936" y="0"/>
+<circle cx="844.11176" cy="682.71918" id="path4128" r="14.229013" style="fill:#ef2929;fill-opacity:1;stroke:none"/>
+<use height="1052.3622" id="use4203" transform="translate(-70.364999,35.291627)" width="744.09448" x="0" xlink:href="#use3985" y="0"/>
+<use height="1052.3622" id="use4205" transform="translate(-100.68747,51.112045)" width="744.09448" x="0" xlink:href="#use3985" y="0"/>
+<use height="1052.3622" id="use4523" transform="translate(-108,124.44444)" width="744.09448" x="0" xlink:href="#use3832" y="0"/>
+<use height="1052.3622" id="use4529" transform="translate(202.38595,-72.12489)" width="744.09448" x="0" xlink:href="#use3930" y="0"/>
+<use height="1052.3622" id="use4531" transform="translate(252.59053,-72.12489)" width="744.09448" x="0" xlink:href="#use3930" y="0"/>
+<circle cx="793.90717" cy="488.2648" id="circle4533" r="14.229013" style="fill:#4e9a06;fill-opacity:1;stroke:none"/>
+<use height="1052.3622" id="use4551" transform="translate(4.3247718e-7,89.849507)" width="744.09448" x="0" xlink:href="#use3926" y="0"/>
+<g id="g4585" transform="matrix(0.82503663,0,0,0.82503663,259.54344,69.258489)">
+<circle cx="252.21976" cy="803.31891" id="path4583" r="10.813566" style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:2.62160444;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"/>
+<circle cx="252.21976" cy="803.31891" id="path4575" r="5.3033009" style="opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"/>
+</g>
+<g id="g4607" transform="matrix(0.82503663,0,0,0.82503663,219.73835,21.012277)">
+<circle cx="252.21976" cy="803.31891" id="circle4609" r="10.813566" style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:2.62160444;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"/>
+<circle cx="252.21976" cy="803.31891" id="circle4611" r="5.3033009" style="opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"/>
+</g>
+<g id="g4613" transform="matrix(0.82503663,0,0,0.82503663,314.49066,21.012277)">
+<circle cx="252.21976" cy="803.31891" id="circle4615" r="10.813566" style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:2.62160444;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"/>
+<circle cx="252.21976" cy="803.31891" id="circle4617" r="5.3033009" style="opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"/>
+</g>
+<g id="g4643" transform="matrix(0.82503663,0,0,0.82503663,219.73835,-104.48772)">
+<circle cx="252.21976" cy="803.31891" id="circle4645" r="10.813566" style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:2.62160444;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"/>
+<circle cx="252.21976" cy="803.31891" id="circle4647" r="5.3033009" style="opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"/>
+</g>
+<g id="g4649" transform="matrix(0.82503663,0,0,0.82503663,219.73835,-176.48772)">
+<circle cx="252.21976" cy="803.31891" id="circle4651" r="10.813566" style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:2.62160444;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"/>
+<circle cx="252.21976" cy="803.31891" id="circle4653" r="5.3033009" style="opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"/>
+</g>
+<g id="g4655" transform="matrix(0.82503663,0,0,0.82503663,315.73835,-176.48772)">
+<circle cx="252.21976" cy="803.31891" id="circle4657" r="10.813566" style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:2.62160444;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"/>
+<circle cx="252.21976" cy="803.31891" id="circle4659" r="5.3033009" style="opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"/>
+</g>
+<g id="g4661" transform="matrix(0.82503663,0,0,0.82503663,315.73835,-102.48772)">
+<circle cx="252.21976" cy="803.31891" id="circle4663" r="10.813566" style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:2.62160444;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"/>
+<circle cx="252.21976" cy="803.31891" id="circle4665" r="5.3033009" style="opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"/>
+</g>
+<g id="g4667" transform="matrix(0.82503663,0,0,0.82503663,110.73835,-102.48772)">
+<circle cx="252.21976" cy="803.31891" id="circle4669" r="10.813566" style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:2.62160444;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"/>
+<circle cx="252.21976" cy="803.31891" id="circle4671" r="5.3033009" style="opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"/>
+</g>
+<g id="g4673" transform="matrix(0.82503663,0,0,0.82503663,413.31909,-176.48772)">
+<circle cx="252.21976" cy="803.31891" id="circle4675" r="10.813566" style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:2.62160444;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"/>
+<circle cx="252.21976" cy="803.31891" id="circle4677" r="5.3033009" style="opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"/>
+</g>
+<g id="g4679" transform="matrix(0.82503663,0,0,0.82503663,413.31909,-102.48772)">
+<circle cx="252.21976" cy="803.31891" id="circle4681" r="10.813566" style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:2.62160444;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"/>
+<circle cx="252.21976" cy="803.31891" id="circle4683" r="5.3033009" style="opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"/>
+</g>
+<g id="g4685" transform="matrix(0.82503663,0,0,0.82503663,413.31909,21.01228)">
+<circle cx="252.21976" cy="803.31891" id="circle4687" r="10.813566" style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:2.62160444;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"/>
+<circle cx="252.21976" cy="803.31891" id="circle4689" r="5.3033009" style="opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"/>
+</g>
+<g id="g4697" transform="matrix(0.82503663,0,0,0.82503663,219.73835,-259.48772)">
+<circle cx="252.21976" cy="803.31891" id="circle4699" r="10.813566" style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:2.62160444;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"/>
+<circle cx="252.21976" cy="803.31891" id="circle4701" r="5.3033009" style="opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"/>
+</g>
+<g id="g4703" transform="matrix(0.82503663,0,0,0.82503663,113.73835,-259.48772)">
+<circle cx="252.21976" cy="803.31891" id="circle4705" r="10.813566" style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:2.62160444;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"/>
+<circle cx="252.21976" cy="803.31891" id="circle4707" r="5.3033009" style="opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"/>
+</g>
+<g id="g4709" transform="matrix(0.82503663,0,0,0.82503663,776.87544,-207.7772)">
+<circle cx="252.21976" cy="803.31891" id="circle4711" r="10.813566" style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:2.62160444;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"/>
+<circle cx="252.21976" cy="803.31891" id="circle4713" r="5.3033009" style="opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"/>
+</g>
+<g id="g4715" transform="matrix(0.82503663,0,0,0.82503663,120.9934,-589.94566)">
+<circle cx="252.21976" cy="803.31891" id="circle4717" r="10.813566" style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:2.62160444;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"/>
+<circle cx="252.21976" cy="803.31891" id="circle4719" r="5.3033009" style="opacity:1;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"/>
+</g>
+</g>
+<g id="layer3" inkscape:groupmode="layer" inkscape:label="chinese" style="display:inline" transform="translate(62.091414,104.50999)">
+<text class="station-label" id="text3812" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="213.04501" xml:space="preserve" y="-2.9763341"><tspan id="tspan3814" sodipodi:role="line" x="213.04501" y="-2.9763341">紅樹林</tspan></text>
+<text class="station-label" id="text3820" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.75px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="121.96225" xml:space="preserve" y="-36.309063"><tspan id="tspan3822" sodipodi:role="line" x="121.96225" y="-36.309063">淡水</tspan></text>
+<text class="station-label" id="text4077" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="206.32144" xml:space="preserve" y="35.108727"><tspan id="tspan4079" sodipodi:role="line" x="206.32144" y="35.108727">竹圍</tspan></text>
+<text class="station-label" id="text4081" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="178.6442" xml:space="preserve" y="99.048523"><tspan id="tspan4083" sodipodi:role="line" x="178.6442" y="99.048523">關渡</tspan></text>
+<text class="station-label" id="text4085" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="234.35887" xml:space="preserve" y="99.208603"><tspan id="tspan4087" sodipodi:role="line" x="234.35887" y="99.208603">忠義</tspan></text>
+<text class="station-label" id="text4089" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="291.05359" xml:space="preserve" y="99.101883"><tspan id="tspan4091" sodipodi:role="line" x="291.05359" y="99.101883">復興崗</tspan></text>
+<text class="station-label" id="text4093" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="383.30392" xml:space="preserve" y="105.99958"><tspan id="tspan4095" sodipodi:role="line" x="383.30392" y="105.99958">奇岩</tspan></text>
+<text class="station-label" id="text4097" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.75px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="421.88229" xml:space="preserve" y="18.138159"><tspan id="tspan4099" sodipodi:role="line" x="421.88229" y="18.138159">新北投</tspan></text>
+<text class="station-label" id="text4101" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="414.51254" xml:space="preserve" y="135.40518"><tspan id="tspan4103" sodipodi:role="line" x="414.51254" y="135.40518">唭哩岸</tspan></text>
+<text class="station-label" id="text4105" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="436.82452" xml:space="preserve" y="167.27524"><tspan id="tspan4107" sodipodi:role="line" x="436.82452" y="167.27524">石牌</tspan></text>
+<text class="station-label" id="text4109" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="401.58441" xml:space="preserve" y="201.60979"><tspan id="tspan4111" sodipodi:role="line" x="401.58441" y="201.60979">明德</tspan></text>
+<text class="station-label" id="text4113" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="402.1969" xml:space="preserve" y="241.15753"><tspan id="tspan4115" sodipodi:role="line" x="402.1969" y="241.15753">芝山</tspan></text>
+<text class="station-label" id="text4117" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="401.70941" xml:space="preserve" y="282.75552"><tspan id="tspan4119" sodipodi:role="line" x="401.70941" y="282.75552">士林</tspan></text>
+<text class="station-label" id="text4121" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="401.92191" xml:space="preserve" y="324.52509"><tspan id="tspan4123" sodipodi:role="line" x="401.92191" y="324.52509">劍潭</tspan></text>
+<text class="station-label" id="text4125" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="402.0094" xml:space="preserve" y="356.38043"><tspan id="tspan4127" sodipodi:role="line" x="402.0094" y="356.38043">圓山</tspan></text>
+<text class="station-label" id="text4133" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.75px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="392.5416" xml:space="preserve" y="384.83292"><tspan id="tspan4135" sodipodi:role="line" x="392.5416" y="384.83292">民權西路</tspan></text>
+<text class="station-label" id="text4137" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="489.68417" xml:space="preserve" y="386.98114"><tspan id="tspan4139" sodipodi:role="line" x="489.68417" y="386.98114">中山國小</tspan></text>
+<text class="station-label" id="text4141" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.75px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="356.19904" xml:space="preserve" y="64.455437"><tspan id="tspan4143" sodipodi:role="line" x="356.19904" y="64.455437">北投</tspan></text>
+<text class="station-label" id="text4145" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="401.34238" xml:space="preserve" y="444.49921"><tspan id="tspan4147" sodipodi:role="line" x="401.34238" y="444.49921">雙連</tspan></text>
+<text class="station-label" id="text4149" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.75px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="398.5094" xml:space="preserve" y="472.72101"><tspan id="tspan4151" sodipodi:role="line" x="398.5094" y="472.72101">中山</tspan></text>
+<text class="station-label" id="text4153" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.75px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="403.4267" xml:space="preserve" y="525.12659"><tspan id="tspan4155" sodipodi:role="line" x="403.4267" y="525.12659">台北</tspan><tspan id="tspan4557" sodipodi:role="line" x="403.4267" y="542.31409">車站</tspan></text>
+<text class="station-label" id="text4157" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="386.00192" xml:space="preserve" y="625.57202"><tspan id="tspan4159" sodipodi:role="line" x="386.00192" y="625.57202">台大醫院</tspan></text>
+<text class="station-label" id="text4161" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.75px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="394.94318" xml:space="preserve" y="697.58246"><tspan id="tspan4163" sodipodi:role="line" x="394.94318" y="697.58246">中正</tspan><tspan id="tspan4549" sodipodi:role="line" x="394.94318" y="714.76996">紀念堂</tspan></text>
+<text class="station-label" id="text4165" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="437.09866" xml:space="preserve" y="736.22632"><tspan id="tspan4167" sodipodi:role="line" x="437.09866" y="736.22632">古亭</tspan></text>
+<text class="station-label" id="text4169" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="538.52454" xml:space="preserve" y="772.85303"><tspan id="tspan4171" sodipodi:role="line" x="538.52454" y="772.85303">台電大樓</tspan></text>
+<text class="station-label" id="text4173" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="553.81409" xml:space="preserve" y="811.9032"><tspan id="tspan4175" sodipodi:role="line" x="553.81409" y="811.9032">公館</tspan></text>
+<text class="station-label" id="text4177" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="554.02753" xml:space="preserve" y="852.85297"><tspan id="tspan4179" sodipodi:role="line" x="554.02753" y="852.85297">萬隆</tspan></text>
+<text class="station-label" id="text4181" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="553.67395" xml:space="preserve" y="892.48901"><tspan id="tspan4183" sodipodi:role="line" x="553.67395" y="892.48901">景美</tspan></text>
+<text class="station-label" id="text4185" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="560.75116" xml:space="preserve" y="929.56012"><tspan id="tspan4187" sodipodi:role="line" x="560.75116" y="929.56012">大坪林</tspan></text>
+<text class="station-label" id="text4189" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.75px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="562.08087" xml:space="preserve" y="965.31744"><tspan id="tspan4191" sodipodi:role="line" x="562.08087" y="965.31744">七張</tspan></text>
+<text class="station-label" id="text4193" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="574.185" xml:space="preserve" y="1007.6104"><tspan id="tspan4195" sodipodi:role="line" x="574.185" y="1007.6104">新店區公所</tspan></text>
+<text class="station-label" id="text4197" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.75px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="493.17426" xml:space="preserve" y="1045.0247"><tspan id="tspan4199" sodipodi:role="line" x="493.17426" y="1045.0247">新店</tspan></text>
+<text class="station-label" id="text4201" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.75px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="452.35416" xml:space="preserve" y="942.12506"><tspan id="tspan4203" sodipodi:role="line" x="452.35416" y="942.12506">小碧潭</tspan></text>
+<text class="station-label" id="text4205" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.75px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="942.82495" xml:space="preserve" y="446.00003"><tspan id="tspan4207" sodipodi:role="line" x="942.82495" y="446.00003">南港</tspan><tspan id="tspan4209" sodipodi:role="line" x="942.82495" y="463.18753">展覽館</tspan></text>
+<text class="station-label" id="text4211" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="971.49463" xml:space="preserve" y="515.0484"><tspan id="tspan4215" sodipodi:role="line" x="971.49463" y="515.0484">南港</tspan></text>
+<text class="station-label" id="text4219" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="933.86365" xml:space="preserve" y="557.18188"><tspan id="tspan4221" sodipodi:role="line" x="933.86365" y="557.18188">昆陽</tspan></text>
+<text class="station-label" id="text4223" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="868.93982" xml:space="preserve" y="585.63269"><tspan id="tspan4225" sodipodi:role="line" x="868.93982" y="585.63269">後山埤</tspan></text>
+<text class="station-label" id="text4227" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="814.63354" xml:space="preserve" y="585.63269"><tspan id="tspan4229" sodipodi:role="line" x="814.63354" y="585.63269">永春</tspan></text>
+<text class="station-label" id="text4231" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="765.25708" xml:space="preserve" y="585.73944"><tspan id="tspan4233" sodipodi:role="line" x="765.25708" y="585.73944">市政府</tspan></text>
+<text class="station-label" id="text4235" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="724.23041" xml:space="preserve" y="585.48596"><tspan id="tspan4237" sodipodi:role="line" x="724.23041" y="585.48596">國父</tspan><tspan id="tspan4295" sodipodi:role="line" x="724.23041" y="601.11096">紀念館</tspan></text>
+<text class="station-label" id="text4239" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="671.74719" xml:space="preserve" y="585.63269"><tspan id="tspan4241" sodipodi:role="line" x="671.74719" y="585.63269">忠孝敦化</tspan></text>
+<text class="station-label" id="text4243" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.75px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="654.19037" xml:space="preserve" y="539.63269"><tspan id="tspan4245" sodipodi:role="line" x="654.19037" y="539.63269">忠孝復興</tspan></text>
+<text class="station-label" id="text4247" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.75px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="559.83264" xml:space="preserve" y="541.68292"><tspan id="tspan4249" sodipodi:role="line" x="559.83264" y="541.68292">忠孝新生</tspan></text>
+<text class="station-label" id="text4251" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="473.64999" xml:space="preserve" y="581.63269"><tspan id="tspan4253" sodipodi:role="line" x="473.64999" y="581.63269">善導寺</tspan></text>
+<text class="station-label" id="text4255" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.75px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="297.95648" xml:space="preserve" y="537.69336"><tspan id="tspan4257" sodipodi:role="line" x="297.95648" y="537.69336">西門</tspan></text>
+<text class="station-label" id="text4259" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="264.1358" xml:space="preserve" y="571.35022"><tspan id="tspan4261" sodipodi:role="line" x="264.1358" y="571.35022">龍山寺</tspan></text>
+<text class="station-label" id="text4263" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="205.91898" xml:space="preserve" y="576.93597"><tspan id="tspan4265" sodipodi:role="line" x="205.91898" y="576.93597">江子翠</tspan></text>
+<text class="station-label" id="text4267" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="211.15318" xml:space="preserve" y="622.13269"><tspan id="tspan4269" sodipodi:role="line" x="211.15318" y="622.13269">新埔</tspan></text>
+<text class="station-label" id="text4271" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="171.67987" xml:space="preserve" y="647.13269"><tspan id="tspan4273" sodipodi:role="line" x="171.67987" y="647.13269">板橋</tspan></text>
+<text class="station-label" id="text4275" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="134.63318" xml:space="preserve" y="671.63269"><tspan id="tspan4277" sodipodi:role="line" x="134.63318" y="671.63269">府中</tspan></text>
+<text class="station-label" id="text4279" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="147.72017" xml:space="preserve" y="716.65784"><tspan id="tspan4281" sodipodi:role="line" x="147.72017" y="716.65784">亞東醫院</tspan></text>
+<text class="station-label" id="text4283" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="134.63318" xml:space="preserve" y="771.13269"><tspan id="tspan4285" sodipodi:role="line" x="134.63318" y="771.13269">海山</tspan></text>
+<text class="station-label" id="text4287" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="134.43307" xml:space="preserve" y="814.47583"><tspan id="tspan4289" sodipodi:role="line" x="134.43307" y="814.47583">土城</tspan></text>
+<text class="station-label" id="text4291" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.75px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="106.57982" xml:space="preserve" y="934.13269"><tspan id="tspan4293" sodipodi:role="line" x="106.57982" y="934.13269">頂埔</tspan></text>
+<text class="station-label" id="text4297" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.75px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="106.07681" xml:space="preserve" y="240.40228"><tspan id="tspan4299" sodipodi:role="line" x="106.07681" y="240.40228">蘆洲</tspan></text>
+<text class="station-label" id="text4301" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="182.90901" xml:space="preserve" y="276.23932"><tspan id="tspan4303" sodipodi:role="line" x="182.90901" y="276.23932">三民高中</tspan></text>
+<text class="station-label" id="text4305" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="215.71005" xml:space="preserve" y="304.11801"><tspan id="tspan4307" sodipodi:role="line" x="215.71005" y="304.11801">徐匯中學</tspan></text>
+<text class="station-label" id="text4309" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="263.20187" xml:space="preserve" y="334.58249"><tspan id="tspan4311" sodipodi:role="line" x="263.20187" y="334.58249">三和國中</tspan></text>
+<text class="station-label" id="text4313" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="296.90833" xml:space="preserve" y="361.21851"><tspan id="tspan4315" sodipodi:role="line" x="296.90833" y="361.21851">三重國小</tspan></text>
+<text class="station-label" id="text4317" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.75px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="326.4689" xml:space="preserve" y="385.46112"><tspan id="tspan4319" sodipodi:role="line" x="326.4689" y="385.46112">大橋頭</tspan></text>
+<text class="station-label" id="text4321" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="308.38919" xml:space="preserve" y="442.29568"><tspan id="tspan4323" sodipodi:role="line" x="308.38919" y="442.29568">台北橋</tspan></text>
+<text class="station-label" id="text4325" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="264.35822" xml:space="preserve" y="464.62411"><tspan id="tspan4327" sodipodi:role="line" x="264.35822" y="464.62411">菜寮</tspan></text>
+<text class="station-label" id="text4329" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="227.33511" xml:space="preserve" y="481.62411"><tspan id="tspan4331" sodipodi:role="line" x="227.33511" y="481.62411">三重</tspan></text>
+<text class="station-label" id="text4333" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="194.03419" xml:space="preserve" y="502.28098"><tspan id="tspan4335" sodipodi:role="line" x="194.03419" y="502.28098">先嗇宮</tspan></text>
+<text class="station-label" id="text4337" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="148.3356" xml:space="preserve" y="520.60931"><tspan id="tspan4339" sodipodi:role="line" x="148.3356" y="520.60931">頭前庄</tspan></text>
+<text class="station-label" id="text4341" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="108.20448" xml:space="preserve" y="540.2558"><tspan id="tspan4343" sodipodi:role="line" x="108.20448" y="540.2558">新莊</tspan></text>
+<text class="station-label" id="text4345" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="75.18483" xml:space="preserve" y="558.44397"><tspan id="tspan4347" sodipodi:role="line" x="75.18483" y="558.44397">輔大</tspan></text>
+<text class="station-label" id="text4349" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="492.49844" xml:space="preserve" y="437.0972"><tspan id="tspan4351" sodipodi:role="line" x="492.49844" y="437.0972">行天宮</tspan></text>
+<text class="station-label" id="text4353" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="485.88785" xml:space="preserve" y="472.0972"><tspan id="tspan4355" sodipodi:role="line" x="485.88785" y="472.0972">松江南京</tspan></text>
+<text class="station-label" id="text4357" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.75px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="497.43701" xml:space="preserve" y="663.36285"><tspan id="tspan4359" sodipodi:role="line" x="497.43701" y="663.36285">東門</tspan></text>
+<text class="station-label" id="text4361" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="390.73392" xml:space="preserve" y="777.62506"><tspan id="tspan4363" sodipodi:role="line" x="390.73392" y="777.62506">頂溪</tspan></text>
+<text class="station-label" id="text4365" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="326.82767" xml:space="preserve" y="834.20477"><tspan id="tspan4367" sodipodi:role="line" x="326.82767" y="834.20477">永安市場</tspan></text>
+<text class="station-label" id="text4369" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="340.16812" xml:space="preserve" y="885.20477"><tspan id="tspan4371" sodipodi:role="line" x="340.16812" y="885.20477">景安</tspan></text>
+<text class="station-label" id="text4373" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.75px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="366.38986" xml:space="preserve" y="972.37634"><tspan id="tspan4375" sodipodi:role="line" x="366.38986" y="972.37634">南勢角</tspan></text>
+<text class="station-label" id="text4377" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="945.49176" xml:space="preserve" y="377.55664"><tspan id="tspan4379" sodipodi:role="line" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;text-anchor:middle" x="945.49176" y="377.55664">南港</tspan><tspan id="tspan4481" sodipodi:role="line" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;text-anchor:middle" x="945.49176" y="393.18164">軟體園區</tspan></text>
+<text class="station-label" id="text4381" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="958.00854" xml:space="preserve" y="312.63272"><tspan id="tspan4383" sodipodi:role="line" x="958.00854" y="312.63272">東湖</tspan></text>
+<text class="station-label" id="text4385" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="937.0152" xml:space="preserve" y="256.63272"><tspan id="tspan4387" sodipodi:role="line" x="937.0152" y="256.63272">葫州</tspan></text>
+<text class="station-label" id="text4389" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="900.35565" xml:space="preserve" y="208.63271"><tspan id="tspan4391" sodipodi:role="line" x="900.35565" y="208.63271">大湖公園</tspan></text>
+<text class="station-label" id="text4393" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="877.48822" xml:space="preserve" y="139.58601"><tspan id="tspan4395" sodipodi:role="line" x="877.48822" y="139.58601">內湖</tspan></text>
+<text class="station-label" id="text4397" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="808.26868" xml:space="preserve" y="139.63271"><tspan id="tspan4399" sodipodi:role="line" x="808.26868" y="139.63271">文德</tspan></text>
+<text class="station-label" id="text4401" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="735.32202" xml:space="preserve" y="139.63271"><tspan id="tspan4403" sodipodi:role="line" x="735.32202" y="139.63271">港墘</tspan></text>
+<text class="station-label" id="text4405" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="663.03522" xml:space="preserve" y="139.58601"><tspan id="tspan4407" sodipodi:role="line" x="663.03522" y="139.58601">西湖</tspan></text>
+<text class="station-label" id="text4409" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="594.04565" xml:space="preserve" y="139.63271"><tspan id="tspan4411" sodipodi:role="line" x="594.04565" y="139.63271">劍南路</tspan></text>
+<text class="station-label" id="text4413" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="604.17529" xml:space="preserve" y="222.63271"><tspan id="tspan4415" sodipodi:role="line" x="604.17529" y="222.63271">大直</tspan></text>
+<text class="station-label" id="text4417" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="676.60913" xml:space="preserve" y="313.63272"><tspan id="tspan4419" sodipodi:role="line" x="676.60913" y="313.63272">松山機場</tspan></text>
+<text class="station-label" id="text4421" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="659.27362" xml:space="preserve" y="408.63272"><tspan id="tspan4423" sodipodi:role="line" x="659.27362" y="408.63272">中山國中</tspan></text>
+<text class="station-label" id="text4425" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.75px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="584.29358" xml:space="preserve" y="469.63272"><tspan id="tspan4427" sodipodi:role="line" x="584.29358" y="469.63272">南京復興</tspan></text>
+<text class="station-label" id="text4429" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.75px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="646.00391" xml:space="preserve" y="663.63306"><tspan id="tspan4431" sodipodi:role="line" x="646.00391" y="663.63306">大安</tspan></text>
+<text class="station-label" id="text4433" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="585.95422" xml:space="preserve" y="737.25812"><tspan id="tspan4435" sodipodi:role="line" x="585.95422" y="737.25812">科技大樓</tspan></text>
+<text class="station-label" id="text4437" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="688.33282" xml:space="preserve" y="783.22455"><tspan id="tspan4439" sodipodi:role="line" x="688.33282" y="783.22455">六張犁</tspan></text>
+<text class="station-label" id="text4441" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="761.76935" xml:space="preserve" y="789.22455"><tspan id="tspan4443" sodipodi:role="line" x="761.76935" y="789.22455">麟光</tspan></text>
+<text class="station-label" id="text4445" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="761.76935" xml:space="preserve" y="824.22455"><tspan id="tspan4447" sodipodi:role="line" x="761.76935" y="824.22455">辛亥</tspan></text>
+<text class="station-label" id="text4449" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="732.91156" xml:space="preserve" y="884.49744"><tspan id="tspan4451" sodipodi:role="line" x="732.91156" y="884.49744">萬芳醫院</tspan></text>
+<text class="station-label" id="text4453" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="799.00977" xml:space="preserve" y="848.24457"><tspan id="tspan4455" sodipodi:role="line" x="799.00977" y="848.24457">萬芳社區</tspan></text>
+<text class="station-label" id="text4457" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="850.78937" xml:space="preserve" y="848.22455"><tspan id="tspan4459" sodipodi:role="line" x="850.78937" y="848.22455">木柵</tspan></text>
+<text class="station-label" id="text4461" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.75px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="947.27948" xml:space="preserve" y="865.22455"><tspan id="tspan4463" sodipodi:role="line" x="947.27948" y="865.22455">動物園</tspan></text>
+<text class="station-label" id="text4465" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="881.12854" xml:space="preserve" y="899.94647"><tspan id="tspan4467" sodipodi:role="line" x="881.12854" y="899.94647">動物園站</tspan></text>
+<text class="station-label" id="text4469" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="899.86981" xml:space="preserve" y="938.94647"><tspan id="tspan4471" sodipodi:role="line" x="899.86981" y="938.94647">動物園內站</tspan></text>
+<text class="station-label" id="text4473" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="900.63513" xml:space="preserve" y="979.94653"><tspan id="tspan4475" sodipodi:role="line" x="900.63513" y="979.94653">指南宮站</tspan></text>
+<text class="station-label" id="text4477" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="872.14185" xml:space="preserve" y="1010.9465"><tspan id="tspan4479" sodipodi:role="line" x="872.14185" y="1010.9465">貓空站</tspan></text>
+<text class="station-label" id="text4483" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="287.65027" xml:space="preserve" y="655.63269"><tspan id="tspan4485" sodipodi:role="line" x="287.65027" y="655.63269">小南門</tspan></text>
+<text class="station-label" id="text5243" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';letter-spacing:0px;word-spacing:0px;fill:#babdb6;fill-opacity:1;stroke:none" x="783.2829" xml:space="preserve" y="972.09277"><tspan id="tspan5245" sodipodi:role="line" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';fill:#babdb6" x="783.2829" y="972.09277">貓空纜車</tspan></text>
+<text class="station-label" id="text4118" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="570.32727" xml:space="preserve" y="653.49713"><tspan id="tspan4120" sodipodi:role="line" x="570.32727" y="653.49713">大安</tspan><tspan id="tspan4122" sodipodi:role="line" x="570.32727" y="669.12213">森林公園</tspan></text>
+<text class="station-label" id="text4130" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="702.17023" xml:space="preserve" y="663.71307"><tspan id="tspan4132" sodipodi:role="line" x="702.17023" y="663.71307">信義安和</tspan></text>
+<text class="station-label" id="text4134" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="767.79608" xml:space="preserve" y="711.79504"><tspan id="tspan4136" sodipodi:role="line" x="767.79608" y="711.79504">台北 101/世貿</tspan></text>
+<text class="station-label" id="text4138" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="845.8797" xml:space="preserve" y="659.20642"><tspan id="tspan4140" sodipodi:role="line" x="845.8797" y="659.20642">象山</tspan></text>
+<path d="m 730.14613,300.26577 c 0.30052,-0.90156 0.24415,-1.5965 -0.16929,-2.08497 -0.4883,-0.41327 -1.18341,-0.46947 -2.08516,-0.16946 -0.90173,0.30052 -1.70941,0.80767 -2.4232,1.52146 l -2.25409,2.25409 -9.36808,-2.23991 c -0.15026,-0.047 -0.29118,-0.01 -0.4226,0.11257 l -1.80331,1.8033 c -0.10322,0.10341 -0.14559,0.23015 -0.12675,0.38041 0.0282,0.15043 0.10808,0.263 0.23949,0.33822 l 7.15669,3.93048 -3.6488,3.64881 -2.73307,-0.74646 c -0.0186,-0.01 -0.0562,-0.0142 -0.11256,-0.0142 -0.13159,0 -0.23949,0.0422 -0.32404,0.12675 l -1.35235,1.36653 c -0.0939,0.11239 -0.13609,0.22997 -0.12675,0.35188 0.0187,0.15026 0.0797,0.25833 0.18311,0.32421 l 3.55008,2.66234 2.66252,3.55008 c 0.0846,0.1034 0.19729,0.16427 0.33821,0.18329 l 0.0281,0 c 0.13159,0 0.23949,-0.0422 0.32405,-0.12658 l 1.35235,-1.35235 c 0.12208,-0.13158 0.15959,-0.27718 0.11274,-0.43678 l -0.74664,-2.73306 3.64881,-3.64898 3.93048,7.15687 c 0.0562,0.12207 0.15493,0.19729 0.29586,0.22547 0.028,0.01 0.061,0.014 0.0986,0.014 0.11256,0 0.20178,-0.0282 0.26749,-0.0844 l 1.80366,-1.35236 c 0.15943,-0.13142 0.21579,-0.28634 0.16894,-0.46479 l -2.25393,-9.80503 2.26811,-2.2681 c 0.71361,-0.71396 1.22076,-1.52181 1.52129,-2.42338 z" id="path4194" inkscape:connector-curvature="0" style="fill:#000000"/>
+<text class="station-label" id="text4207" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="40.248074" xml:space="preserve" y="576.5603"><tspan id="tspan4210" sodipodi:role="line" x="40.248074" y="576.5603">丹鳳</tspan></text>
+<text class="station-label" id="text4212" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.75px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="-9.8499165" xml:space="preserve" y="543.28271"><tspan id="tspan4214" sodipodi:role="line" x="-9.8499165" y="543.28271">迴龍</tspan></text>
+<text class="station-label" id="text4525" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.75px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="294.45648" xml:space="preserve" y="491.67258"><tspan id="tspan4527" sodipodi:role="line" x="294.45648" y="491.67258">北門</tspan></text>
+<text class="station-label" id="text4535" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.75px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="674.80322" xml:space="preserve" y="457.63272"><tspan id="tspan4537" sodipodi:role="line" x="674.80322" y="457.63272">台北</tspan><tspan id="tspan4543" sodipodi:role="line" x="674.80322" y="474.82022">小巨蛋</tspan></text>
+<text class="station-label" id="text4539" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.75px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="730.9281" xml:space="preserve" y="469.63272"><tspan id="tspan4541" sodipodi:role="line" x="730.9281" y="469.63272">南京三民</tspan></text>
+<text class="station-label" id="text4545" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.75px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="792.84723" xml:space="preserve" y="463.63272"><tspan id="tspan4547" sodipodi:role="line" x="792.84723" y="463.63272">松山</tspan></text>
+<text class="station-label" id="text4553" sodipodi:linespacing="125%" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:'Noto Sans CJK TC';-inkscape-font-specification:'Noto Sans CJK TC';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;display:inline;fill:#000000;fill-opacity:1;stroke:none" x="134.43307" xml:space="preserve" y="860.25403"><tspan id="tspan4555" sodipodi:role="line" x="134.43307" y="860.25403">永寧</tspan></text>
+</g>
+
+</svg>
+
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+const stationCoords = {
+		{
+			  "七張": {
+			    "x": 562.1,
+			    "y": 965.3
+			  },
+			  "三和國中": {
+			    "x": 263.2,
+			    "y": 334.6
+			  },
+			  "三民高中": {
+			    "x": 182.9,
+			    "y": 276.2
+			  },
+			  "三重": {
+			    "x": 227.3,
+			    "y": 481.6
+			  },
+			  "三重國小": {
+			    "x": 296.9,
+			    "y": 361.2
+			  },
+			  "中山": {
+			    "x": 398.5,
+			    "y": 472.7
+			  },
+			  "中山國中": {
+			    "x": 659.3,
+			    "y": 408.6
+			  },
+			  "中山國小": {
+			    "x": 489.7,
+			    "y": 387.0
+			  },
+			  "中正": {
+			    "x": 394.9,
+			    "y": 697.6
+			  },
+			  "中正紀念堂": {
+			    "x": 394.9,
+			    "y": 697.6
+			  },
+			  "丹鳳": {
+			    "x": 40.2,
+			    "y": 576.6
+			  },
+			  "亞東醫院": {
+			    "x": 147.7,
+			    "y": 716.7
+			  },
+			  "信義安和": {
+			    "x": 702.2,
+			    "y": 663.7
+			  },
+			  "先嗇宮": {
+			    "x": 194.0,
+			    "y": 502.3
+			  },
+			  "內湖": {
+			    "x": 877.5,
+			    "y": 139.6
+			  },
+			  "公館": {
+			    "x": 553.8,
+			    "y": 811.9
+			  },
+			  "六張犁": {
+			    "x": 688.3,
+			    "y": 783.2
+			  },
+			  "劍南路": {
+			    "x": 594.0,
+			    "y": 139.6
+			  },
+			  "劍潭": {
+			    "x": 401.9,
+			    "y": 324.5
+			  },
+			  "動物園": {
+			    "x": 947.3,
+			    "y": 865.2
+			  },
+			  "動物園內站": {
+			    "x": 899.9,
+			    "y": 938.9
+			  },
+			  "動物園站": {
+			    "x": 881.1,
+			    "y": 899.9
+			  },
+			  "北投": {
+			    "x": 356.2,
+			    "y": 64.5
+			  },
+			  "北門": {
+			    "x": 294.5,
+			    "y": 491.7
+			  },
+			  "南京三民": {
+			    "x": 730.9,
+			    "y": 469.6
+			  },
+			  "南京復興": {
+			    "x": 584.3,
+			    "y": 469.6
+			  },
+			  "南勢角": {
+			    "x": 366.4,
+			    "y": 972.4
+			  },
+			  "南港": {
+			    "x": 945.5,
+			    "y": 377.6
+			  },
+			  "南港展覽館": {
+			    "x": 942.8,
+			    "y": 446.0
+			  },
+			  "南港軟體園區": {
+			    "x": 945.5,
+			    "y": 377.6
+			  },
+			  "古亭": {
+			    "x": 437.1,
+			    "y": 736.2
+			  },
+			  "台北": {
+			    "x": 674.8,
+			    "y": 457.6
+			  },
+			  "台北 101/世貿": {
+			    "x": 767.8,
+			    "y": 711.8
+			  },
+			  "台北小巨蛋": {
+			    "x": 674.8,
+			    "y": 457.6
+			  },
+			  "台北橋": {
+			    "x": 308.4,
+			    "y": 442.3
+			  },
+			  "台北車站": {
+			    "x": 403.4,
+			    "y": 525.1
+			  },
+			  "台大醫院": {
+			    "x": 386.0,
+			    "y": 625.6
+			  },
+			  "台電大樓": {
+			    "x": 538.5,
+			    "y": 772.9
+			  },
+			  "唭哩岸": {
+			    "x": 414.5,
+			    "y": 135.4
+			  },
+			  "善導寺": {
+			    "x": 473.6,
+			    "y": 581.6
+			  },
+			  "國父": {
+			    "x": 724.2,
+			    "y": 585.5
+			  },
+			  "國父紀念館": {
+			    "x": 724.2,
+			    "y": 585.5
+			  },
+			  "圓山": {
+			    "x": 402.0,
+			    "y": 356.4
+			  },
+			  "土城": {
+			    "x": 134.4,
+			    "y": 814.5
+			  },
+			  "士林": {
+			    "x": 401.7,
+			    "y": 282.8
+			  },
+			  "大坪林": {
+			    "x": 560.8,
+			    "y": 929.6
+			  },
+			  "大安": {
+			    "x": 570.3,
+			    "y": 653.5
+			  },
+			  "大安森林公園": {
+			    "x": 570.3,
+			    "y": 653.5
+			  },
+			  "大橋頭": {
+			    "x": 326.5,
+			    "y": 385.5
+			  },
+			  "大湖公園": {
+			    "x": 900.4,
+			    "y": 208.6
+			  },
+			  "大直": {
+			    "x": 604.2,
+			    "y": 222.6
+			  },
+			  "奇岩": {
+			    "x": 383.3,
+			    "y": 106.0
+			  },
+			  "小南門": {
+			    "x": 287.7,
+			    "y": 655.6
+			  },
+			  "小巨蛋": {
+			    "x": 674.8,
+			    "y": 457.6
+			  },
+			  "小碧潭": {
+			    "x": 452.4,
+			    "y": 942.1
+			  },
+			  "展覽館": {
+			    "x": 942.8,
+			    "y": 446.0
+			  },
+			  "市政府": {
+			    "x": 765.3,
+			    "y": 585.7
+			  },
+			  "府中": {
+			    "x": 134.6,
+			    "y": 671.6
+			  },
+			  "後山埤": {
+			    "x": 868.9,
+			    "y": 585.6
+			  },
+			  "徐匯中學": {
+			    "x": 215.7,
+			    "y": 304.1
+			  },
+			  "復興崗": {
+			    "x": 291.1,
+			    "y": 99.1
+			  },
+			  "忠孝復興": {
+			    "x": 654.2,
+			    "y": 539.6
+			  },
+			  "忠孝敦化": {
+			    "x": 671.7,
+			    "y": 585.6
+			  },
+			  "忠孝新生": {
+			    "x": 559.8,
+			    "y": 541.7
+			  },
+			  "忠義": {
+			    "x": 234.4,
+			    "y": 99.2
+			  },
+			  "指南宮站": {
+			    "x": 900.6,
+			    "y": 979.9
+			  },
+			  "文德": {
+			    "x": 808.3,
+			    "y": 139.6
+			  },
+			  "新北投": {
+			    "x": 421.9,
+			    "y": 18.1
+			  },
+			  "新埔": {
+			    "x": 211.2,
+			    "y": 622.1
+			  },
+			  "新店": {
+			    "x": 493.2,
+			    "y": 1045.0
+			  },
+			  "新店區公所": {
+			    "x": 574.2,
+			    "y": 1007.6
+			  },
+			  "新莊": {
+			    "x": 108.2,
+			    "y": 540.3
+			  },
+			  "昆陽": {
+			    "x": 933.9,
+			    "y": 557.2
+			  },
+			  "明德": {
+			    "x": 401.6,
+			    "y": 201.6
+			  },
+			  "景安": {
+			    "x": 340.2,
+			    "y": 885.2
+			  },
+			  "景美": {
+			    "x": 553.7,
+			    "y": 892.5
+			  },
+			  "木柵": {
+			    "x": 850.8,
+			    "y": 848.2
+			  },
+			  "東湖": {
+			    "x": 958.0,
+			    "y": 312.6
+			  },
+			  "東門": {
+			    "x": 497.4,
+			    "y": 663.4
+			  },
+			  "松山": {
+			    "x": 792.8,
+			    "y": 463.6
+			  },
+			  "松山機場": {
+			    "x": 676.6,
+			    "y": 313.6
+			  },
+			  "松江南京": {
+			    "x": 485.9,
+			    "y": 472.1
+			  },
+			  "板橋": {
+			    "x": 171.7,
+			    "y": 647.1
+			  },
+			  "森林公園": {
+			    "x": 570.3,
+			    "y": 653.5
+			  },
+			  "民權西路": {
+			    "x": 392.5,
+			    "y": 384.8
+			  },
+			  "永安市場": {
+			    "x": 326.8,
+			    "y": 834.2
+			  },
+			  "永寧": {
+			    "x": 134.4,
+			    "y": 860.3
+			  },
+			  "永春": {
+			    "x": 814.6,
+			    "y": 585.6
+			  },
+			  "江子翠": {
+			    "x": 205.9,
+			    "y": 576.9
+			  },
+			  "海山": {
+			    "x": 134.6,
+			    "y": 771.1
+			  },
+			  "淡水": {
+			    "x": 122.0,
+			    "y": -36.3
+			  },
+			  "港墘": {
+			    "x": 735.3,
+			    "y": 139.6
+			  },
+			  "石牌": {
+			    "x": 436.8,
+			    "y": 167.3
+			  },
+			  "科技大樓": {
+			    "x": 586.0,
+			    "y": 737.3
+			  },
+			  "竹圍": {
+			    "x": 206.3,
+			    "y": 35.1
+			  },
+			  "紀念堂": {
+			    "x": 394.9,
+			    "y": 697.6
+			  },
+			  "紀念館": {
+			    "x": 724.2,
+			    "y": 585.5
+			  },
+			  "紅樹林": {
+			    "x": 213.0,
+			    "y": -3.0
+			  },
+			  "芝山": {
+			    "x": 402.2,
+			    "y": 241.2
+			  },
+			  "菜寮": {
+			    "x": 264.4,
+			    "y": 464.6
+			  },
+			  "萬芳社區": {
+			    "x": 799.0,
+			    "y": 848.2
+			  },
+			  "萬芳醫院": {
+			    "x": 732.9,
+			    "y": 884.5
+			  },
+			  "萬隆": {
+			    "x": 554.0,
+			    "y": 852.9
+			  },
+			  "葫州": {
+			    "x": 937.0,
+			    "y": 256.6
+			  },
+			  "蘆洲": {
+			    "x": 106.1,
+			    "y": 240.4
+			  },
+			  "行天宮": {
+			    "x": 492.5,
+			    "y": 437.1
+			  },
+			  "西湖": {
+			    "x": 663.0,
+			    "y": 139.6
+			  },
+			  "西門": {
+			    "x": 298.0,
+			    "y": 537.7
+			  },
+			  "象山": {
+			    "x": 845.9,
+			    "y": 659.2
+			  },
+			  "貓空站": {
+			    "x": 872.1,
+			    "y": 1010.9
+			  },
+			  "貓空纜車": {
+			    "x": 783.3,
+			    "y": 972.1
+			  },
+			  "車站": {
+			    "x": 403.4,
+			    "y": 525.1
+			  },
+			  "軟體園區": {
+			    "x": 945.5,
+			    "y": 377.6
+			  },
+			  "輔大": {
+			    "x": 75.2,
+			    "y": 558.4
+			  },
+			  "辛亥": {
+			    "x": 761.8,
+			    "y": 824.2
+			  },
+			  "迴龍": {
+			    "x": -9.8,
+			    "y": 543.3
+			  },
+			  "關渡": {
+			    "x": 178.6,
+			    "y": 99.0
+			  },
+			  "雙連": {
+			    "x": 401.3,
+			    "y": 444.5
+			  },
+			  "頂埔": {
+			    "x": 106.6,
+			    "y": 934.1
+			  },
+			  "頂溪": {
+			    "x": 390.7,
+			    "y": 777.6
+			  },
+			  "頭前庄": {
+			    "x": 148.3,
+			    "y": 520.6
+			  },
+			  "麟光": {
+			    "x": 761.8,
+			    "y": 789.2
+			  },
+			  "龍山寺": {
+			    "x": 264.1,
+			    "y": 571.4
+			  }
+			}
+  // ... 請匯入完整的 station_coords.json
+};</script>
+<style>
+@keyframes glowText {
+ 0% {
+    fill: 	#1565C0;
+    font-size: 14px;
+    font-weight: normal;
+    opacity: 1;
+  }
+  50% {
+    fill: red;
+    font-size: 20px;
+    font-weight: bold;
+    opacity: 0.3;
+  }
+  100% {
+    fill: orange;
+    font-size: 14px;
+    font-weight: normal;
+    opacity: 1;
+  }
+}
+
+.highlight-station {
+  animation: glowText 1s infinite;
+</style>
+
+</div>
