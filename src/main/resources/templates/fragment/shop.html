@@ -14,12 +14,13 @@
         <div class="row justify-content-center" id="productList">
           <div th:each="product : ${products}" class="col-6 col-md-3 col-lg-2 mb-4">
             <div class="card h-100">
-              <img th:src="${product.imageUrl != null ? product.imageUrl : '/images/placeholder.png'}"
-                   th:attr="data-bs-toggle='tooltip', data-bs-placement='top', title=${product.description}"
-                   class="card-img-top"
-                   style="height: 120px; object-fit: cover;"
-                   th:alt="#{shop.image}"
-                   onerror="this.src='/images/placeholder.png'">
+				<img th:src="${product.imageUrl != null ? product.imageUrl : '/uploads/images/placeholder.png'}"
+				     th:attr="data-bs-toggle='tooltip', data-bs-placement='top', title=${product.description}"
+				     class="card-img-top"
+				     style="height: 120px; object-fit: cover;"
+				     th:alt="#{shop.image}"
+				     onerror="this.onerror=null; this.src='/uploads/images/placeholder.png'">
+
               <div class="card-body text-center p-2 d-flex flex-column justify-content-between">
                 <p class="card-title fw-semibold mb-1" style="font-size: 14px; word-break: break-word;">
                   <span th:text="${product.name}">商品名稱</span>

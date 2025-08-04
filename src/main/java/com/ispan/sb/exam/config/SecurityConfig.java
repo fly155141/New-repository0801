@@ -27,12 +27,13 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/index", "/auth/register", "/auth/checkUsername", "/css/**", "/js/**").permitAll()
-                .requestMatchers("/fragment/**").authenticated()
-                .requestMatchers("/api/upload", "/api/deleteAll", "/api/add", "/api/update/**", "/api/delete/**").hasRole("ADMIN")
-                .anyRequest().authenticated()
-            )
+        .authorizeHttpRequests(auth -> auth
+        	    .requestMatchers("/", "/index", "/auth/register", "/auth/checkUsername", "/css/**", "/js/**", "/images/**").permitAll()
+        	    .requestMatchers("/fragment/**").authenticated()
+        	    .requestMatchers("/api/upload", "/api/deleteAll", "/api/add", "/api/update/**", "/api/delete/**").hasRole("ADMIN")
+        	    .anyRequest().authenticated()
+        	)
+
             .formLogin(form -> form
                 .loginPage("/index")                    // 登入頁
                 .loginProcessingUrl("/login")           // Spring Security 自動處理
