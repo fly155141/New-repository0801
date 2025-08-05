@@ -97,10 +97,7 @@
         <button type="submit" class="btn btn-warning" th:text="#{announcement.updateBtn}">更新公告</button>
     </form>
 </div>
-<!-- 放在 dashboard.html 的公告區塊附近 -->
 <div id="announcementMessage" class="text-center mt-2"></div>
-
-
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
@@ -109,17 +106,17 @@
                 <li class="nav-item"><a class="nav-link" href="#price" onclick="navigateAndReload('price')" th:text="#{nav.price}">票價查詢</a></li>
                 <li class="nav-item"><a class="nav-link" href="#map" onclick="navigateAndReload('map')" th:text="#{nav.map}">自製地圖</a></li>
                 <li class="nav-item"><a class="nav-link" href="#shop" onclick="navigateAndReload('shop')" th:text="#{nav.shop}">購物專區</a></li>
+                <sec:authorize access="hasRole('ADMIN')">
+                    <li class="nav-item"><a class="nav-link" href="#orders" onclick="navigateAndReload('orders')">訂單管理</a></li>
+                </sec:authorize>
                 <li class="nav-item">
                     <a class="nav-link" href="#" onclick="switchLang()" th:text="${#locale.language.startsWith('en')} ? 'EN / CH' : '中 / EN'">中 / EN</a>
                 </li>
             </ul>
             <form th:action="@{/logout}" method="post" class="ms-3" onsubmit="clearCartBeforeLogout()">
-  <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
-  <button class="btn btn-outline-light" type="submit" th:text="#{nav.logout}">登出</button>
-</form>
-
-
-
+                <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
+                <button class="btn btn-outline-light" type="submit" th:text="#{nav.logout}">登出</button>
+            </form>
         </div>
     </div>
 </nav>
@@ -133,137 +130,8 @@
     <span th:text="#{footer.email}">Email：service@mrt-tw.gov</span>
 </footer>
 
-<script>
-function loadContent(section) {
-    const main = document.getElementById('mainContent');
-    const urlMap = {
-        'price': '/fragment/price',
-        'map': '/fragment/map',
-        'shop': '/fragment/shop',
-        'welcome': '/fragment/welcome'
-    };
-    const baseUrl = urlMap[section];
-    if (!baseUrl) return;
-
-    const currentLang = new URL(window.location.href).searchParams.get('lang');
-    const fullUrl = currentLang ? `${baseUrl}?lang=${currentLang}` : baseUrl;
-
-    window.location.hash = section;
-
-    fetch(fullUrl)
-        .then(res => res.text())
-        .then(html => {
-            main.innerHTML = `<div id="messageArea" class="mb-3"></div>${html}`;
-            main.className = section === 'price' ? 'main-content text-start' : 'main-content text-center';
-
-            if (typeof bindAllEventHandlers === 'function') bindAllEventHandlers();
-            if (section === 'price') {
-                if (typeof markFavoriteButtons === 'function') markFavoriteButtons();
-                // ✅ 修正：改成 fragment 完成插入後再呼叫 loadPricePage()
-                setTimeout(() => {
-                    if (typeof loadPricePage === 'function') {
-                        loadPricePage(0);
-                    }
-                }, 0);
-            }
-        })
-        .catch(err => {
-            main.innerHTML = `<div class="text-danger">載入失敗：${err}</div>`;
-        });
-}
-
-
-function navigateAndReload(section) {
-    const url = new URL(window.location.href);
-    url.hash = section;
-    window.location.href = url.toString();
-}
-
-function switchLang() {
-    const url = new URL(window.location.href);
-    const currentLang = url.searchParams.get('lang');
-    const targetLang = currentLang === 'en' ? 'zh-TW' : 'en';
-    url.searchParams.set('lang', targetLang);
-
-    // 強制重新載入目前 hash 區塊
-    const hash = window.location.hash.replace('#', '') || 'welcome';
-    window.location.href = url.toString().split('#')[0] + '#' + hash;
-}
-
-
-function updateAnnouncement() {
-    const text = document.getElementById('announcementInput').value.trim();
-    const msgDiv = document.getElementById('announcementMessage');
-
-    if (!msgDiv) {
-        console.warn("❗ 找不到 #announcementMessage 元素");
-        return;
-    }
-
-    // 🟥 輸入為空，顯示錯誤
-    if (text.length === 0) {
-        msgDiv.className = 'text-danger fw-bold text-center mt-2';
-        msgDiv.innerText = window.i18n?.['announcement.empty'] || '❌ 請輸入公告內容';
-        return;
-    }
-
-    // ✅ 呼叫後端更新公告
-    fetch("/api/announcement", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            [csrfHeaderName]: csrfToken
-        },
-        body: JSON.stringify({ content: text })
-    })
-    .then(res => {
-        if (!res.ok) {
-            throw new Error(window.i18n?.['announcement.error'] || '❌ 更新失敗');
-        }
-
-        // 🟢 更新跑馬燈內容
-        document.getElementById('marqueeText').innerText = text;
-
-        // ✅ 成功訊息顯示
-        msgDiv.className = 'text-success fw-bold text-center mt-2';
-        msgDiv.innerText = window.i18n?.['announcement.updated'] || '✅ 公告已更新';
-    })
-    .catch(err => {
-        msgDiv.className = 'text-danger fw-bold text-center mt-2';
-        msgDiv.innerText = err.message || (window.i18n?.['announcement.error'] || '❌ 更新失敗');
-    });
-}
-
-// 初次載入
-document.addEventListener('DOMContentLoaded', () => {
-    // ✅ 一進來就載入語系
-    fetch('/api/i18n')
-        .then(res => res.json())
-        .then(data => {
-            window.i18n = data;
-        });
-
-    const hash = window.location.hash.replace('#', '');
-    const validSections = ['price', 'map', 'shop'];
-    if (validSections.includes(hash)) {
-        loadContent(hash);
-    } else {
-        loadContent('welcome');
-    }
-});
-
-
-window.addEventListener('hashchange', () => {
-    const hash = window.location.hash.replace('#', '');
-    const validSections = ['price', 'map', 'shop'];
-    if (validSections.includes(hash)) {
-        loadContent(hash);
-    }
-});
-
-
-</script>
-
 <script src="/js/dashboard-full.js"></script>
+<!-- CDN React 和 ReactDOM，建議加在 dashboard.html 最底部 -->
+
 </body>
 </html>

@@ -13,12 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import com.ispan.sb.exam.CartItemDto;
-import com.ispan.sb.exam.Order;
-import com.ispan.sb.exam.OrderItem;
-import com.ispan.sb.exam.Product;
-import com.ispan.sb.exam.User;
-import com.ispan.sb.exam.OrderRequestDto;
+import com.ispan.sb.exam.*;
 import com.ispan.sb.exam.repository.OrderRepository;
 import com.ispan.sb.exam.repository.ProductRepository;
 import com.ispan.sb.exam.services.UserService;
@@ -43,47 +38,72 @@ public class OrderController {
     @Transactional
     @PostMapping
     public ResponseEntity<?> createOrder(@RequestBody OrderRequestDto request, Principal principal) {
-        List<CartItemDto> cartItems = request.getItems();
-        if (cartItems == null || cartItems.isEmpty()) {
-            return ResponseEntity.badRequest().body("購物車是空的");
-        }
-
-        User user = userService.findByUsername(principal.getName());
-
-        Order order = new Order();
-        order.setUser(user);
-        order.setCreatedAt(LocalDateTime.now());
-        order.setPickupLocation(request.getPickupLocation());
-
-        List<OrderItem> items = cartItems.stream().map(item -> {
-            // ✅ 使用悲觀鎖查詢
-            Product product = productRepository.findByIdWithLock(item.getProductId());
-            if (product == null || product.getStock() < item.getQuantity()) {
-                throw new IllegalArgumentException("商品不存在或庫存不足：" + item.getProductId());
+        try {
+            List<CartItemDto> cartItems = request.getItems();
+            if (cartItems == null || cartItems.isEmpty()) {
+                return ResponseEntity.badRequest().body("購物車是空的");
             }
 
-            // ✅ 扣庫存
-            product.setStock(product.getStock() - item.getQuantity());
-            productRepository.save(product);
+            User user = userService.findByUsername(principal.getName());
 
-            OrderItem orderItem = new OrderItem();
-            orderItem.setOrder(order);
-            orderItem.setProduct(product);
-            orderItem.setQuantity(item.getQuantity());
-            orderItem.setPrice(product.getPrice());
-            return orderItem;
-        }).collect(Collectors.toList());
+            Order order = new Order();
+            order.setUser(user);
+            order.setCreatedAt(LocalDateTime.now());
+            order.setPickupLocation(request.getPickupLocation());
 
-        order.setItems(items);
-        orderRepository.save(order);
+            List<OrderItem> items = cartItems.stream().map(item -> {
+                Product product = productRepository.findByIdWithLock(item.getProductId());
+                if (product == null || product.getStock() < item.getQuantity()) {
+                    throw new IllegalArgumentException("商品不存在或庫存不足：" + item.getProductId());
+                }
 
-        // ✅ 使用填寫的 email 寄信
-        sendConfirmationEmail(request.getEmail(), request.getPickupLocation(), order.getId());
+                product.setStock(product.getStock() - item.getQuantity());
+                productRepository.save(product);
 
-        return ResponseEntity.ok("✅ 訂單建立成功，通知已寄送至：" + request.getEmail());
+                OrderItem orderItem = new OrderItem();
+                orderItem.setOrder(order);
+                orderItem.setProduct(product);
+                orderItem.setQuantity(item.getQuantity());
+                orderItem.setPrice(product.getPrice());
+                return orderItem;
+            }).collect(Collectors.toList());
+
+            order.setItems(items);
+            orderRepository.save(order);
+
+            sendConfirmationEmail(request.getEmail(), request.getPickupLocation(), order.getId());
+
+            return ResponseEntity.ok("✅ 訂單建立成功，通知已寄送至：" + request.getEmail());
+
+        } catch (Exception e) {
+            e.printStackTrace(); // ✅ 印出詳細錯誤堆疊
+            return ResponseEntity.status(500).body("❌ 建立訂單失敗：" + e.getMessage());
+        }
     }
 
-    // ✅ 寄送測試信
+
+    // ✅ 查詢所有訂單（限 ADMIN）
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/all")
+    public List<Order> getAllOrdersForAdmin() {
+        return orderRepository.findAll();
+    }
+
+
+    // ✅ 更新訂單狀態（限 ADMIN）
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{id}/status")
+    public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestParam OrderStatus status) {
+        Order order = orderRepository.findById(id).orElse(null);
+        if (order == null) {
+            return ResponseEntity.notFound().build();
+        }
+        order.setStatus(status);
+        orderRepository.save(order);
+        return ResponseEntity.ok("✅ 訂單狀態已更新為：" + status.name());
+    }
+
+    // ✅ 寄送測試信（限 ADMIN）
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/test-mail")
     public ResponseEntity<?> testMail() {
@@ -91,8 +111,14 @@ public class OrderController {
         sendConfirmationEmail(testEmail, "測試門市", 0L);
         return ResponseEntity.ok("✅ 測試信已寄送至：" + testEmail);
     }
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping
+    public List<Order> getOrders() {
+        return orderRepository.findAll();
+    }
 
-    // ✅ 寄送訂單確認信
+
+    // ✅ 通用寄信方法
     private void sendConfirmationEmail(String to, String location, Long orderId) {
         String subject = "【捷運購物】訂單已成立，請至指定門市取貨";
         String content = String.format("""
@@ -112,4 +138,6 @@ public class OrderController {
         message.setText(content);
         mailSender.send(message);
     }
+   
 }
+

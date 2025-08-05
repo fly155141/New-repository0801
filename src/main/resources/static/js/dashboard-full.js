@@ -179,7 +179,8 @@ function loadContent(section) {
         'price': '/fragment/price',
         'map': '/fragment/map',
         'shop': '/fragment/shop',
-        'welcome': '/fragment/welcome'
+        'welcome': '/fragment/welcome',
+		'orders': '/fragment/orders'
     };
     const baseUrl = urlMap[section];
     if (!baseUrl) return;
@@ -250,6 +251,10 @@ function loadContent(section) {
                 <div class="text-danger">載入失敗：${err}</div>
             `;
         });
+}
+function navigateAndReload(section) {
+  window.location.hash = section;
+  loadContent(section);
 }
 
 
@@ -1202,32 +1207,45 @@ function previewProductImage(event) {
 
 
 	function updateCartUI() {
-	  const cartList = document.getElementById("cartItems");
-	  const cartTotalSpan = document.getElementById("cartTotal");
-	  cartList.innerHTML = "";
+	  const cartList = document.getElementById("cartItems");  // ✅ 改對 ID
+	  const cartCount = document.getElementById("cartCount"); // 可選
+	  const cartTotal = document.getElementById("cartTotal");
 
-	  if (cart.length === 0) {
-	    cartList.innerHTML = "<li class='list-group-item'>購物車是空的</li>";
-	    cartTotalSpan.textContent = "$0";
-	    return;
-	  }
+	  if (!cartList || !cartTotal) return;
+
+	  cartList.innerHTML = "";
 
 	  let total = 0;
 	  cart.forEach(item => {
-	    const subtotal = item.price * item.quantity;
-	    total += subtotal;
-
 	    const li = document.createElement("li");
 	    li.className = "list-group-item d-flex justify-content-between align-items-center";
 	    li.innerHTML = `
-	      <span>${item.name} x ${item.quantity}</span>
-	      <span class="text-danger">NT$${subtotal}</span>
+	      ${item.name} × ${item.quantity}
+	      <span>$${item.price * item.quantity}</span>
 	    `;
 	    cartList.appendChild(li);
+	    total += item.price * item.quantity;
 	  });
 
-	  cartTotalSpan.textContent = `NT$${total}`;
+	  cartTotal.textContent = total.toFixed(0);
+	  if (cartCount) cartCount.textContent = cart.length;
 	}
+	function clearCart() {
+	  if (cart.length === 0) {
+	    showMessage(window.i18n?.["cart.empty"] || "🛒 購物車是空的！", false);
+	    return;
+	  }
+
+	  cart.length = 0;                         // 清空記憶體中購物車陣列
+	  localStorage.removeItem('cart');         // ✅ 同步清除本地儲存
+	  updateCartUI();                          // 更新畫面
+	  showMessage(window.i18n?.["cart.clear.success"] || "🗑 購物車已清空", true);
+	}
+
+	// ✅ 必須綁成全域（讓 HTML onclick 可以使用）
+	window.clearCart = clearCart;
+
+
 
 //購物車結帳
 function checkout() {
@@ -1270,11 +1288,16 @@ function confirmCheckout() {
     return;
   }
 
+  // 📝 取值
   const rawCardNumber = document.getElementById("cardNumber").value.trim();
   const cardNumber = rawCardNumber.replace(/\s+/g, '');
   const cardCVV = document.getElementById("cardCVV").value.trim();
-  const email = document.getElementById("checkoutEmail")?.value.trim(); // ⬅️ 新增 email 欄位
+  const email = document.getElementById("checkoutEmail")?.value.trim();
+  const name = document.getElementById("checkoutName")?.value.trim();
+  const phone = document.getElementById("checkoutPhone")?.value.trim();
+  const pickupLocation = document.getElementById("pickupLocation")?.value.trim();
 
+  // ✅ 前端驗證
   if (!/^\d{12,19}$/.test(cardNumber)) {
     showMessage("❌ 卡號格式錯誤，請輸入 12~19 位數字", false);
     return;
@@ -1293,21 +1316,25 @@ function confirmCheckout() {
   // ✅ 即時庫存檢查（每一筆商品）
   const checks = cart.map(item =>
     fetch(`/api/products/check-stock-by-id?id=${item.productId}&quantity=${item.quantity}`)
-      .then(res => {
+      .then(async res => {
+        const msg = await res.text();
         if (!res.ok) {
-          return res.text().then(msg => {
-            throw new Error(`❌ 商品「${item.name}」庫存不足：${msg}`);
-          });
+          throw new Error(`❌ 商品「${item.name}」庫存不足：${msg}`);
         }
-        return res.text();
+        return msg;
       })
   );
 
   Promise.all(checks)
     .then(() => {
-      // ✅ 包裝 email + 商品項目
+      // ✅ 封裝傳送資料
       const cartItems = {
+        name,
+        phone,
         email,
+        pickupLocation,
+        cardNumber,
+        cardCVV,
         items: cart.map(item => ({
           productId: item.productId,
           quantity: item.quantity
@@ -1323,7 +1350,11 @@ function confirmCheckout() {
         body: JSON.stringify(cartItems)
       });
     })
-    .then(res => res.text())
+    .then(async res => {
+      const msg = await res.text();
+      if (!res.ok) throw new Error(msg); // 拋出錯誤訊息
+      return msg;
+    })
     .then(msg => {
       showMessage(msg, true);
       clearCart();
@@ -1331,6 +1362,25 @@ function confirmCheckout() {
     })
     .catch(err => {
       showMessage(err.message || "❌ 結帳失敗", false);
+    });
+}
+
+
+
+function bindCheckoutEvents() {
+  const confirmBtn = document.getElementById("confirmCheckoutBtn");
+  if (confirmBtn) {
+    confirmBtn.addEventListener("click", confirmCheckout);
+  } else {
+    console.warn("⚠️ 找不到確認結帳按鈕 confirmCheckoutBtn");
+  }
+}
+function loadShopFragment() {
+  fetch('/fragment/shop')
+    .then(response => response.text())
+    .then(html => {
+      document.getElementById('mainContent').innerHTML = html;
+      bindCheckoutEvents(); // ⬅️ 載入後綁定按鈕事件
     });
 }
 
@@ -1372,21 +1422,9 @@ function sendTestMail() {
     .then(msg => showMessage(msg, true))
     .catch(err => showMessage("❌ " + err.message, false));
 }
-function clearCart() {
-  if (cart.length === 0) {
-    showMessage(window.i18n?.["cart.empty"] || "🛒 購物車是空的！", false);
-    return;
-  }
-
-  cart.length = 0;                         // 清空記憶體中購物車陣列
-  localStorage.removeItem('cart');         // ✅ 同步清除本地儲存
-  updateCartUI();                          // 更新畫面
-  showMessage(window.i18n?.["cart.clear.success"] || "🗑 購物車已清空", true);
-}
-window.clearCart = clearCart; // 綁定為全域函式
-
-// ✅ 購物車還原邏輯（登入後或重新整理時）
+// ✅ 根據網址 hash 決定載入哪個區塊
 document.addEventListener('DOMContentLoaded', () => {
+  // 🛒 載入購物車內容
   const savedCart = localStorage.getItem('cart');
   if (savedCart) {
     cart.length = 0;
@@ -1394,22 +1432,34 @@ document.addEventListener('DOMContentLoaded', () => {
     updateCartUI();
   }
 
-  // 🟢 載入初始 welcome 畫面（可選）
-  if (typeof loadContent === 'function') {
+  // ✅ 綁定結帳按鈕（避免載入 shop 區塊後找不到按鈕）
+  bindCheckoutEvents();
+
+  // 🧭 根據網址 hash 載入對應區塊
+  const hash = window.location.hash.replace('#', '');
+  const validSections = ['price', 'map', 'shop', 'orders', 'welcome'];
+
+  if (validSections.includes(hash)) {
+    loadContent(hash);
+  } else {
     loadContent('welcome');
   }
 });
 
-function updateFileName() {
-		    const fileInput = document.getElementById('csvFile');
-		    const fileNameLabel = document.getElementById('fileNameLabel');
-		    const file = fileInput?.files[0];
 
-		    fileNameLabel.textContent = file
-		        ? file.name
-		        : (window.i18n?.['file.none'] || '未選擇任何檔案');
-		}
-function clearCartBeforeLogout() {
-		  localStorage.removeItem('cart'); // ✅ 登出時清除本地購物車
-		}
+window.addEventListener('hashchange', () => {
+  const hash = window.location.hash.replace('#', '');
+  const validSections = ['price', 'map', 'shop', 'orders', 'welcome']; // ✅ 加上 'welcome'
+  if (validSections.includes(hash)) {
+    loadContent(hash);
+  }
+});
+// ✅ 語系切換
+function switchLang() {
+  const currentLang = document.documentElement.lang;
+  const newLang = currentLang === 'zh' ? 'en' : 'zh';
+  const url = new URL(window.location.href);
+  url.searchParams.set('lang', newLang);
+  window.location.href = url.toString();
+}
 

@@ -2,6 +2,7 @@ package com.ispan.sb.exam;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "products")
@@ -36,6 +37,8 @@ public class Product {
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
     }
+    @OneToMany(mappedBy = "product")
+    private List<OrderItem> orderItems;
 
 
     // ✅ Getter / Setter

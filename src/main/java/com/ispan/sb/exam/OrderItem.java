@@ -1,5 +1,7 @@
 package com.ispan.sb.exam;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -11,7 +13,8 @@ public class OrderItem {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "order_id")  // FK 對應 orders.id
+    @JoinColumn(name = "order_id")
+    @JsonBackReference  // ✅ 搭配上方 ManagedReference
     private Order order;
 
     @ManyToOne

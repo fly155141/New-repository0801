@@ -7,17 +7,22 @@ import org.springframework.web.servlet.config.annotation.*;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
+import jakarta.annotation.PostConstruct;
+
+import java.io.File;
+import java.nio.file.Paths;
 import java.util.Locale;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
     // ✅ 靜態資源處理
-    @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/uploads/images/**")
-                .addResourceLocations("file:uploads/images/");
-    }
+	@Override
+	public void addResourceHandlers(ResourceHandlerRegistry registry) {
+	    String absolutePath = Paths.get("uploads/images").toAbsolutePath().toUri().toString();
+	    registry.addResourceHandler("/uploads/images/**")
+	            .addResourceLocations(absolutePath);
+	}
 
     // ✅ 語系切換攔截器：支援 ?lang=en
     @Bean
@@ -39,5 +44,14 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(localeChangeInterceptor());
+    }
+    
+    @PostConstruct
+    public void createUploadDirIfNotExist() {
+        File dir = new File("uploads/images");
+        if (!dir.exists()) {
+            dir.mkdirs();
+            System.out.println("✅ 建立資料夾：uploads/images");
+        }
     }
 }

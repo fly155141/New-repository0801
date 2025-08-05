@@ -117,6 +117,11 @@ public class PageController {
 
         return "fragment/shop";
     }
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/fragment/orders")
+    public String fragmentOrders() {
+        return "fragment/orders";
+    }
 
 
     @RestController
@@ -144,5 +149,6 @@ public class PageController {
             }
             return ResponseEntity.badRequest().body("公告不得為空");
         }
+        
     }
 }

@@ -3,11 +3,13 @@ package com.ispan.sb.exam.controller;
 import com.ispan.sb.exam.Product;
 import com.ispan.sb.exam.User;
 import com.ispan.sb.exam.repository.ProductRepository;
+import com.ispan.sb.exam.services.ProductService;
 import com.ispan.sb.exam.services.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -28,13 +30,16 @@ public class ProductController {
     @Autowired
     private UserService userService;
 
-    // ✅ 取得所有商品（依建立時間排序，最新在前）
+    @Autowired
+    private ProductService productService; // ✅ 新增：商品邏輯檢查
+
+    // ✅ 取得所有商品（依建立時間排序）
     @GetMapping
     public List<Product> getAllProducts() {
         return productRepository.findAllByOrderByCreatedAtDesc();
     }
 
-    // ✅ 原本的：用 name 檢查庫存（保留）
+    // ✅ 原本：用 name 檢查庫存
     @GetMapping("/check-stock")
     public ResponseEntity<?> checkStock(@RequestParam String name, @RequestParam int quantity) {
         Product product = productRepository.findByName(name);
@@ -47,7 +52,7 @@ public class ProductController {
         return ResponseEntity.ok("✅ 可加入購物車");
     }
 
-    // ✅ 新增的：用 ID 檢查庫存（建議前端使用這個）
+    // ✅ 新增：用 ID 檢查庫存（推薦）
     @GetMapping("/check-stock-by-id")
     public ResponseEntity<?> checkStockById(@RequestParam Long id, @RequestParam int quantity) {
         Product product = productRepository.findById(id).orElse(null);
@@ -60,7 +65,7 @@ public class ProductController {
         return ResponseEntity.ok("✅ 可加入購物車");
     }
 
-    // ✅ 上傳商品（含圖片與存貨）-- 只有 ADMIN 可用
+    // ✅ 建立商品（含圖片與驗證）-- 只限 ADMIN
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional
@@ -73,7 +78,7 @@ public class ProductController {
             Principal principal
     ) {
         try {
-            // ✅ 商品名稱驗證
+            // 驗證：名稱
             if (name == null || name.trim().isEmpty()) {
                 return ResponseEntity.badRequest().body("錯誤：商品名稱不得為空");
             }
@@ -81,22 +86,22 @@ public class ProductController {
                 return ResponseEntity.badRequest().body("錯誤：商品名稱僅限中英文、數字與空格，最多20字");
             }
 
-            // ✅ 敘述驗證
+            // 驗證：描述
             if (description != null && description.length() > 100) {
                 return ResponseEntity.badRequest().body("錯誤：商品敘述不得超過100字");
             }
 
-            // ✅ 價格驗證
+            // 驗證：價格
             if (price == null || price <= 0) {
                 return ResponseEntity.badRequest().body("錯誤：價格必須為正整數");
             }
 
-            // ✅ 存貨驗證
+            // 驗證：庫存
             if (stock == null || stock < 0) {
                 return ResponseEntity.badRequest().body("錯誤：存貨必須為 0 或正整數");
             }
 
-            // ✅ 儲存圖片
+            // 儲存圖片
             String imageUrl = null;
             if (imageFile != null && !imageFile.isEmpty()) {
                 String originalFilename = imageFile.getOriginalFilename();
@@ -109,10 +114,10 @@ public class ProductController {
                 imageUrl = "/uploads/images/" + filename;
             }
 
-            // ✅ 查詢使用者
+            // 查詢使用者
             User user = userService.findByUsername(principal.getName());
 
-            // ✅ 儲存商品
+            // 建立商品
             Product product = new Product();
             product.setName(name.trim());
             product.setDescription(description != null ? description.trim() : null);
@@ -129,7 +134,7 @@ public class ProductController {
         }
     }
 
-    // ✅ 根據 ID 刪除商品（僅 ADMIN）
+    // ✅ 刪除商品（檢查是否被未完成訂單使用）
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional
@@ -139,7 +144,14 @@ public class ProductController {
             return ResponseEntity.badRequest().body("錯誤：找不到該商品");
         }
 
-        // ✅ 刪除圖片
+        // ✅ 新增檢查是否可刪除（含未完成訂單）
+        if (!productService.canDeleteProduct(id)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("❌ 商品有未完成的訂單紀錄，禁止刪除");
+        }
+
+        // ✅ 刪除圖片（如有）
         if (product.getImageUrl() != null && product.getImageUrl().startsWith("/uploads/images/")) {
             try {
                 Path imagePath = Paths.get("uploads", "images", Paths.get(product.getImageUrl()).getFileName().toString());
@@ -149,6 +161,7 @@ public class ProductController {
             }
         }
 
+        // ✅ 刪除商品資料
         productRepository.deleteById(id);
         return ResponseEntity.ok("✅ 商品已刪除");
     }

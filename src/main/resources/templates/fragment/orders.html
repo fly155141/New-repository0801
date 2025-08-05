@@ -1,0 +1,89 @@
+<!-- templates/fragment/orders.html -->
+<div style="padding: 1rem;">
+  <h3>✅ 成功載入訂單管理頁面</h3>
+  <div id="orderMessage" style="color: green; margin-bottom: 1rem;"></div>
+
+  <table class="table table-bordered table-striped">
+    <thead class="table-dark">
+      <tr>
+        <th>訂單編號</th>
+        <th>建立時間</th>
+        <th>狀態</th>
+        <th>總金額</th>
+        <th>更新狀態</th>
+      </tr>
+    </thead>
+    <tbody id="orderTableBody">
+      <!-- 由 JS 動態填入 -->
+    </tbody>
+  </table>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  loadOrders();
+});
+
+const orderStatusOptions = [
+  "PENDING", "SHIPPED", "RETURNING", "COMPLETED", "CANCELED"
+];
+
+// ✅ 載入所有訂單
+function loadOrders() {
+  fetch('/api/orders/all')
+    .then(res => res.json())
+    .then(data => renderOrders(data))
+    .catch(err => console.error('❌ 載入訂單失敗:', err));
+}
+
+function renderOrders(orders) {
+  const tbody = document.getElementById('orderTableBody');
+  tbody.innerHTML = '';
+
+  if (orders.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5">尚無訂單資料</td></tr>';
+    return;
+  }
+
+  orders.forEach(order => {
+    const tr = document.createElement('tr');
+
+    tr.innerHTML = `
+      <td>${order.id}</td>
+      <td>${order.createdAt?.replace('T', ' ').substring(0, 16)}</td>
+      <td>${order.status}</td>
+      <td>${order.totalAmount}</td>
+      <td>
+        <select class="form-select" onchange="updateOrderStatus(${order.id}, this.value)">
+          ${orderStatusOptions.map(status =>
+            `<option value="${status}" ${order.status === status ? 'selected' : ''}>${status}</option>`
+          ).join('')}
+        </select>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// ✅ 更新訂單狀態
+function updateOrderStatus(orderId, newStatus) {
+  fetch(`/api/orders/${orderId}/status?status=${newStatus}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+  .then(res => {
+    if (!res.ok) throw new Error('更新失敗');
+    return res.text();
+  })
+  .then(msg => {
+    document.getElementById('orderMessage').textContent = `✔️ 訂單 ${orderId} 狀態已更新為 ${newStatus}`;
+    loadOrders();
+  })
+  .catch(err => {
+    document.getElementById('orderMessage').textContent = `❌ 訂單 ${orderId} 更新失敗`;
+    console.error(err);
+  });
+}
+</script>
